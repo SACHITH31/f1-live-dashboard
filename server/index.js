@@ -12,11 +12,33 @@ app.get("/api/test", (req, res) => {
 
 app.get("/api/cars", async (req, res) => {
     try {
-        const response = await axios.get("https://api.openf1.org/v1/drivers")
-        res.json(response.data)
+        const response = await axios.get(
+            "https://api.openf1.org/v1/positions?session_key=latest"
+        )
+
+        if (!Array.isArray(response.data) || response.data.length === 0) {
+            throw new Error("No live data")
+        }
+
+        const cars = response.data.map(car => ({
+            driver: car.driver_number,
+            x: car.x,
+            y: car.y
+        }))
+
+        res.json(cars)
+
     } catch (error) {
-        console.log(error.message)
-        res.status(500).json({ error: "Failed to fetch car data" })
+        console.log("Using fallback data")
+
+        // 🔥 Fallback simulated data
+        const mockCars = Array.from({ length: 10 }).map((_, i) => ({
+            driver: i + 1,
+            x: Math.random() * 1000,
+            y: Math.random() * 1000
+        }))
+
+        res.json(mockCars)
     }
 })
 
