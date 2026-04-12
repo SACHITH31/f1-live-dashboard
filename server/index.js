@@ -42,6 +42,22 @@ app.get("/api/cars", async (req, res) => {
     }
 })
 
+app.get("/api/race", (req, res) => {
+    const now = new Date()
+
+    const raceTime = new Date()
+    raceTime.setHours(19, 30, 0) // 7:30 PM today
+
+    const isLive = now >= raceTime
+
+    res.json({
+        name: "Bahrain Grand Prix",
+        time: raceTime,
+        isLive
+    })
+})
+
+
 app.listen(5000, () => {
     console.log("✅ Server running on port 5000")
 })
