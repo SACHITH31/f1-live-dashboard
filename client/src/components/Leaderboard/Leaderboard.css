@@ -1,0 +1,16 @@
+.leaderboard {
+  padding: 20px;
+}
+
+.leaderboard h2 {
+  color: #e10600;
+  margin-bottom: 20px;
+}
+
+.driver {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #222;
+  color: #e0e0e0;
+}

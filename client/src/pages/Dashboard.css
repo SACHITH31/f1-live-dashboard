@@ -1,0 +1,27 @@
+.dashboard {
+  height: 100vh;
+  background-color: #0a0b0d;
+}
+
+.main {
+  display: grid;
+  grid-template-columns: 20% 60% 20%;
+  height: calc(100vh - 70px);
+}
+
+.left,
+.right {
+  background-color: #16191e;
+  border-right: 1px solid #222;
+}
+
+.right {
+  border-left: 1px solid #222;
+  border-right: none;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
