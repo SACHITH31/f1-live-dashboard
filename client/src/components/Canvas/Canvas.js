@@ -2,7 +2,8 @@ import { useEffect, useRef } from "react"
 import { driversData } from "../../services/teams"
 import "./Canvas.css"
 
-function Canvas({ cars, selectedDriver, setSelectedDriver }) {
+function Canvas({ cars, trackImage, selectedDriver, setSelectedDriver }) {
+  const trackImgRef = useRef(null)
   const canvasRef = useRef(null)
   const prevCarsRef = useRef([])
 
@@ -10,6 +11,16 @@ function Canvas({ cars, selectedDriver, setSelectedDriver }) {
     if (max - min === 0) return size / 2
     return ((val - min) / (max - min)) * size
   }
+  useEffect(() => {
+  if (!trackImage) return
+
+  const img = new Image()
+  img.src = trackImage
+
+  img.onload = () => {
+    trackImgRef.current = img
+  }
+}, [trackImage])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -18,13 +29,17 @@ function Canvas({ cars, selectedDriver, setSelectedDriver }) {
     let animationFrameId
 
     const animate = () => {
-      ctx.fillStyle = "#0a0b0d"
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      if (trackImgRef.current) {
+  ctx.drawImage(trackImgRef.current, 0, 0, canvas.width, canvas.height)
+} else {
+  ctx.fillStyle = "#0a0b0d"
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
+}
 
       if (!cars || cars.length === 0) {
         ctx.fillStyle = "#888"
         ctx.font = "16px Arial"
-        ctx.fillText("No Live Race Data", 300, 250)
+        // ctx.fillText("No Live Race Data", 300, 250)
         return
       }
 

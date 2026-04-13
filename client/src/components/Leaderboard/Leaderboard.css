@@ -19,3 +19,28 @@
   background-color: rgba(225, 6, 0, 0.2);
   border-left: 3px solid #e10600;
 }
+
+.leaderboard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.driver {
+  display: flex;
+  align-items: center;
+  background: #16191e;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #222;
+  transition: transform 0.4s ease, background 0.3s;
+}
+
+.driver:hover {
+  background: #1c1f26;
+}
+
+.driver.active {
+  border: 1px solid #e10600;
+  box-shadow: 0 0 10px rgba(225, 6, 0, 0.3);
+}

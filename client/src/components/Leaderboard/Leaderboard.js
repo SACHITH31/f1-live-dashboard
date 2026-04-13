@@ -3,8 +3,9 @@ import "./Leaderboard.css"
 function Leaderboard({ cars, drivers, selectedDriver, setSelectedDriver }) {
 
   // 🔥 Merge car + driver data
-  const merged = cars.map(car => {
-    const driver = drivers.find(d => d.driver_number === car.driver)
+  const merged = cars
+  .map(car => {
+    const driver = drivers.find(d => d.driver_number == car.driver)
     return {
       ...car,
       name: driver?.full_name || `Driver ${car.driver}`,
@@ -12,6 +13,7 @@ function Leaderboard({ cars, drivers, selectedDriver, setSelectedDriver }) {
       color: driver?.team_colour || "#e10600"
     }
   })
+  .sort((a, b) => a.y - b.y) // 🔥 ranking logic
 
   return (
     <div className="leaderboard">

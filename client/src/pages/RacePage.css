@@ -65,3 +65,11 @@
   padding: 20px;
   border-radius: 10px;
 }
+
+.no-live-message {
+  text-align: center;
+  margin-top: 10px;
+  color: #888;
+  font-style: italic;
+  font-size: 14px;
+}
