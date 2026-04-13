@@ -1,68 +1,66 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar/Navbar";
-import { getRaceData } from "../services/api";
-import "./Dashboard.css";
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import Navbar from "../components/Navbar/Navbar"
+import { getRaceData } from "../services/api"
+import "./Dashboard.css"
 
 function Dashboard() {
-  const [loading, setLoading] = useState(true);
-  const [race, setRace] = useState(null);
-  const [isLive, setIsLive] = useState(false);
-  const [timeLeft, setTimeLeft] = useState("");
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true)
+  const [race, setRace] = useState(null)
+  const [isLive, setIsLive] = useState(false)
+  const [timeLeft, setTimeLeft] = useState("")
+  const navigate = useNavigate()
 
   useEffect(() => {
-    let isMounted = true;
+    let isMounted = true
 
     const fetchData = async () => {
-      setLoading(true);
-
       try {
-        const data = await getRaceData();
-        // console.log(data);
+        const data = await getRaceData()
 
         if (isMounted && data) {
-          setIsLive(data.isLive);
-          if (data.race !== null) {
-            setRace(data.race);
+          setIsLive(data.isLive)
+
+          if (data.race) {
+            setRace(prev => prev || data.race)
           }
         }
       } catch (err) {
-        console.log("Fetch error:", err);
+        console.log("Fetch error:", err)
       }
 
-      if (isMounted) setLoading(false);
-    };
+      if (isMounted) setLoading(false)
+    }
 
-    fetchData();
+    fetchData()
 
     return () => {
-      isMounted = false;
-    };
-  }, []);
-  // console.log(loading);
+      isMounted = false
+    }
+  }, [])
+
   useEffect(() => {
-    if (!race || isLive) return;
+    if (!race || isLive) return
 
     const interval = setInterval(() => {
-      const now = new Date();
-      const raceTime = new Date(race.date_start);
-      const diff = raceTime - now;
+      const now = new Date()
+      const raceTime = new Date(race.date_start)
+      const diff = raceTime - now
 
       if (diff <= 0) {
-        setTimeLeft("Starting soon...");
-        return;
+        setTimeLeft("Starting soon...")
+        return
       }
 
-      const h = Math.floor(diff / (1000 * 60 * 60));
-      const m = Math.floor((diff / (1000 * 60)) % 60);
-      const s = Math.floor((diff / 1000) % 60);
+      const h = Math.floor(diff / (1000 * 60 * 60))
+      const m = Math.floor((diff / (1000 * 60)) % 60)
+      const s = Math.floor((diff / 1000) % 60)
 
-      setTimeLeft(`${h}h ${m}m ${s}s`);
-    }, 1000);
+      setTimeLeft(`${h}h ${m}m ${s}s`)
+    }, 1000)
 
-    return () => clearInterval(interval);
-  }, [race, isLive]);
+    return () => clearInterval(interval)
+  }, [race, isLive])
 
   return (
     <div className="dashboard">
@@ -74,17 +72,13 @@ function Dashboard() {
         ) : isLive ? (
           <div className="race-card live" onClick={() => navigate("/race")}>
             <h2>LIVE NOW 🔴</h2>
-            <p>
-              {race?.location} - {race?.country_name}
-            </p>
+            <p>{race?.location} - {race?.country_name}</p>
             <button>Go to Live Race →</button>
           </div>
         ) : race ? (
           <div className="race-card" onClick={() => navigate("/race")}>
             <h2>UPCOMING RACE</h2>
-            <p>
-              {race.location} - {race.country_name}
-            </p>
+            <p>{race.location} - {race.country_name}</p>
             <p>{new Date(race.date_start).toLocaleString()}</p>
             <h3>{timeLeft}</h3>
             <button>View Race Details →</button>
@@ -94,7 +88,7 @@ function Dashboard() {
         )}
       </div>
     </div>
-  );
+  )
 }
 
-export default Dashboard;
+export default Dashboard

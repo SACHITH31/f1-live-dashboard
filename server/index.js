@@ -82,4 +82,54 @@ app.get("/api/race", async (req, res) => {
   }
 })
 
+app.get("/api/location", async (req, res) => {
+  try {
+    const response = await axios.get(
+      "https://api.openf1.org/v1/location?session_key=latest"
+    )
+
+    if (!Array.isArray(response.data) || response.data.length === 0) {
+      return res.json([])
+    }
+
+    // ✅ latest position per driver
+    const latest = Object.values(
+      response.data.reduce((acc, curr) => {
+        if (
+          !acc[curr.driver_number] ||
+          new Date(curr.date) > new Date(acc[curr.driver_number].date)
+        ) {
+          acc[curr.driver_number] = curr
+        }
+        return acc
+      }, {})
+    )
+
+    const cars = latest.map(car => ({
+      driver: car.driver_number,
+      x: car.x,
+      y: car.y
+    }))
+
+    res.json(cars)
+
+  } catch (err) {
+    console.log("Location API error")
+    res.json([])
+  }
+})
+
+app.get("/api/drivers", async (req, res) => {
+  try {
+    const response = await axios.get(
+      "https://api.openf1.org/v1/drivers?session_key=latest"
+    )
+
+    res.json(response.data)
+  } catch (err) {
+    console.log("Drivers API error")
+    res.json([])
+  }
+})
+
 app.listen(5000, () => console.log("Server running on 5000"))

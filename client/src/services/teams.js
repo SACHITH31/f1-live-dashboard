@@ -39,3 +39,25 @@ export const teamColors = {
   "20": "#ffffff",
   "27": "#ffffff"
 }
+
+
+
+export const driversData = {
+  1: { name: "Max Verstappen", team: "Red Bull", color: "#1E5BC6" },
+  11: { name: "Sergio Perez", team: "Red Bull", color: "#1E5BC6" },
+
+  44: { name: "Lewis Hamilton", team: "Mercedes", color: "#00D2BE" },
+  63: { name: "George Russell", team: "Mercedes", color: "#00D2BE" },
+
+  16: { name: "Charles Leclerc", team: "Ferrari", color: "#DC0000" },
+  55: { name: "Carlos Sainz", team: "Ferrari", color: "#DC0000" },
+
+  4: { name: "Lando Norris", team: "McLaren", color: "#FF8700" },
+  81: { name: "Oscar Piastri", team: "McLaren", color: "#FF8700" },
+
+  14: { name: "Fernando Alonso", team: "Aston Martin", color: "#006F62" },
+  18: { name: "Lance Stroll", team: "Aston Martin", color: "#006F62" },
+
+  10: { name: "Pierre Gasly", team: "Alpine", color: "#0090FF" },
+  31: { name: "Esteban Ocon", team: "Alpine", color: "#0090FF" }
+}

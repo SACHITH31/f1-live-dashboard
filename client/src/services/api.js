@@ -19,3 +19,22 @@ export const getRaceData = async () => {
     return null
   }
 }
+
+export const getLocations = async () => {
+  try {
+    const res = await fetch("http://localhost:5000/api/location")
+    const data = await res.json()
+    return data
+  } catch {
+    return []
+  }
+}
+
+export const getDrivers = async () => {
+  try {
+    const res = await fetch("http://localhost:5000/api/drivers")
+    return await res.json()
+  } catch {
+    return []
+  }
+}

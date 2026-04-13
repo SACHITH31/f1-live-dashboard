@@ -1,13 +1,15 @@
 import { useEffect, useRef } from "react"
-import { trackPath } from "../../services/track"
-import { teamColors } from "../../services/teams"
+import { driversData } from "../../services/teams"
 import "./Canvas.css"
 
 function Canvas({ cars, selectedDriver, setSelectedDriver }) {
   const canvasRef = useRef(null)
+  const prevCarsRef = useRef([])
 
-  const carPositions = useRef({})
-  const carProgress = useRef({})
+  const scale = (val, min, max, size) => {
+    if (max - min === 0) return size / 2
+    return ((val - min) / (max - min)) * size
+  }
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -16,56 +18,40 @@ function Canvas({ cars, selectedDriver, setSelectedDriver }) {
     let animationFrameId
 
     const animate = () => {
-      ctx.fillStyle = "#0b0b0d"
+      ctx.fillStyle = "#0a0b0d"
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      // 🛣️ DRAW TRACK
-      ctx.beginPath()
-      ctx.strokeStyle = "#444"
-      ctx.lineWidth = 3
+      if (!cars || cars.length === 0) {
+        ctx.fillStyle = "#888"
+        ctx.font = "16px Arial"
+        ctx.fillText("No Live Race Data", 300, 250)
+        return
+      }
 
-      trackPath.forEach((p, i) => {
-        if (i === 0) ctx.moveTo(p.x, p.y)
-        else ctx.lineTo(p.x, p.y)
-      })
+      const xs = cars.map(c => c.x)
+      const ys = cars.map(c => c.y)
 
-      ctx.closePath()
-      ctx.stroke()
+      const minX = Math.min(...xs)
+      const maxX = Math.max(...xs)
+      const minY = Math.min(...ys)
+      const maxY = Math.max(...ys)
 
-      // 🚗 MOVE + DRAW CARS
-      cars.forEach((car) => {
-        // 🧠 INIT PROGRESS
-        if (!carProgress.current[car.driver]) {
-          carProgress.current[car.driver] = Math.random() * trackPath.length
-        }
+      cars.forEach((car, i) => {
+        const prev = prevCarsRef.current[i] || car
 
-        // 🔥 INCREASE PROGRESS (THIS MAKES MOVEMENT)
-        carProgress.current[car.driver] += 0.02
+        const smoothX = prev.x + (car.x - prev.x) * 0.1
+        const smoothY = prev.y + (car.y - prev.y) * 0.1
 
-        if (carProgress.current[car.driver] >= trackPath.length) {
-          carProgress.current[car.driver] = 0
-        }
+        const x = scale(smoothX, minX, maxX, canvas.width)
+        const y = scale(smoothY, minY, maxY, canvas.height)
 
-        const index = Math.floor(carProgress.current[car.driver])
-        const nextIndex = (index + 1) % trackPath.length
+        const driver = driversData[car.driver]
+        const color = driver?.color || "#e10600"
 
-        const t = carProgress.current[car.driver] - index
-
-        const p1 = trackPath[index]
-        const p2 = trackPath[nextIndex]
-
-        // 🧠 INTERPOLATE BETWEEN POINTS
-        const x = p1.x + (p2.x - p1.x) * t
-        const y = p1.y + (p2.y - p1.y) * t
-
-        carPositions.current[car.driver] = { x, y }
-
-        const color = teamColors[car.driver] || "#e10600"
-
+        // 🚗 Draw car
         ctx.beginPath()
-        ctx.arc(x, y, 7, 0, 2 * Math.PI)
+        ctx.arc(x, y, 6, 0, 2 * Math.PI)
 
-        // glow
         ctx.shadowBlur = 10
         ctx.shadowColor = color
 
@@ -74,7 +60,12 @@ function Canvas({ cars, selectedDriver, setSelectedDriver }) {
 
         ctx.shadowBlur = 0
 
-        // highlight
+        // 🟢 Label
+        ctx.fillStyle = "#e0e0e0"
+        ctx.font = "10px Arial"
+        ctx.fillText(car.driver, x + 8, y)
+
+        // 🔥 Highlight
         if (selectedDriver === car.driver) {
           ctx.beginPath()
           ctx.arc(x, y, 10, 0, 2 * Math.PI)
@@ -82,6 +73,9 @@ function Canvas({ cars, selectedDriver, setSelectedDriver }) {
           ctx.lineWidth = 2
           ctx.stroke()
         }
+
+        // Save smooth pos
+        prevCarsRef.current[i] = { x: smoothX, y: smoothY }
       })
 
       animationFrameId = requestAnimationFrame(animate)
@@ -100,11 +94,14 @@ function Canvas({ cars, selectedDriver, setSelectedDriver }) {
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
 
-    cars.forEach((car) => {
-      const pos = carPositions.current[car.driver]
-      if (!pos) return
+    cars.forEach((car, i) => {
+      const prev = prevCarsRef.current[i]
+      if (!prev) return
 
-      const dist = Math.sqrt((x - pos.x) ** 2 + (y - pos.y) ** 2)
+      const dx = scale(prev.x, 0, 1000, canvas.width)
+      const dy = scale(prev.y, 0, 1000, canvas.height)
+
+      const dist = Math.sqrt((x - dx) ** 2 + (y - dy) ** 2)
 
       if (dist < 10) {
         setSelectedDriver(car.driver)

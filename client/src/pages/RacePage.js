@@ -2,15 +2,17 @@ import { useEffect, useState } from "react"
 import Navbar from "../components/Navbar/Navbar"
 import Canvas from "../components/Canvas/Canvas"
 import Leaderboard from "../components/Leaderboard/Leaderboard"
-import { getRaceData } from "../services/api"
+import { getRaceData, getDrivers } from "../services/api"
 import "./RacePage.css"
 
 function RacePage() {
   const [race, setRace] = useState(null)
   const [isLive, setIsLive] = useState(false)
   const [cars, setCars] = useState([])
+  const [drivers, setDrivers] = useState([])
   const [selectedDriver, setSelectedDriver] = useState(null)
 
+  // 🔥 FETCH RACE DATA
   useEffect(() => {
     let interval
 
@@ -25,7 +27,6 @@ function RacePage() {
         setCars(data.cars)
       }
 
-      // 🔥 polling only if live
       if (data.isLive) {
         clearInterval(interval)
         interval = setInterval(fetchData, 3000)
@@ -37,17 +38,29 @@ function RacePage() {
     return () => clearInterval(interval)
   }, [])
 
+  // 🔥 FETCH DRIVERS (ONLY ONCE)
+  useEffect(() => {
+    const fetchDrivers = async () => {
+      const data = await getDrivers()
+      if (Array.isArray(data)) {
+        setDrivers(data)
+      }
+    }
+
+    fetchDrivers()
+  }, [])
+
   return (
     <div className="race-page">
       <Navbar />
 
-      {/* 🔴 LIVE MODE */}
       {isLive ? (
         <div className="race-layout">
 
           <div className="left">
             <Leaderboard
               cars={cars}
+              drivers={drivers}
               selectedDriver={selectedDriver}
               setSelectedDriver={setSelectedDriver}
             />
@@ -68,19 +81,15 @@ function RacePage() {
 
         </div>
       ) : (
-
-        /* 🔴 NOT LIVE MODE */
         <div className="race-details">
           <h2>UPCOMING RACE</h2>
           <p>{race?.location} - {race?.country_name}</p>
           <p>{new Date(race?.date_start).toLocaleString()}</p>
 
-          {/* Track preview */}
           <div className="track-box">
             <Canvas cars={[]} />
           </div>
 
-          {/* Drivers placeholder (we improve next) */}
           <div className="drivers-box">
             <p>Drivers will be available during live race</p>
           </div>
