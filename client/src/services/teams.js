@@ -1,46 +1,44 @@
 export const teamColors = {
   // Red Bull
-  "1": "#0600ef",
-  "11": "#0600ef",
+  1: "#0600ef",
+  11: "#0600ef",
 
   // Ferrari
-  "16": "#dc0000",
-  "55": "#dc0000",
+  16: "#dc0000",
+  55: "#dc0000",
 
   // Mercedes
-  "44": "#00d2be",
-  "63": "#00d2be",
+  44: "#00d2be",
+  63: "#00d2be",
 
   // McLaren
-  "4": "#ff8700",
-  "81": "#ff8700",
+  4: "#ff8700",
+  81: "#ff8700",
 
   // Aston Martin
-  "14": "#006f62",
-  "18": "#006f62",
+  14: "#006f62",
+  18: "#006f62",
 
   // Alpine
-  "10": "#0090ff",
-  "31": "#0090ff",
+  10: "#0090ff",
+  31: "#0090ff",
 
   // Williams
-  "23": "#005aff",
-  "2": "#005aff",
+  23: "#005aff",
+  2: "#005aff",
 
   // AlphaTauri / RB
-  "22": "#2b4562",
-  "3": "#2b4562",
+  22: "#2b4562",
+  3: "#2b4562",
 
   // Alfa Romeo / Sauber
-  "77": "#900000",
-  "24": "#900000",
+  77: "#900000",
+  24: "#900000",
 
   // Haas
-  "20": "#ffffff",
-  "27": "#ffffff"
-}
-
-
+  20: "#ffffff",
+  27: "#ffffff",
+};
 
 export const driversData = {
   1: { name: "Max Verstappen", team: "Red Bull", color: "#1E5BC6" },
@@ -59,5 +57,5 @@ export const driversData = {
   18: { name: "Lance Stroll", team: "Aston Martin", color: "#006F62" },
 
   10: { name: "Pierre Gasly", team: "Alpine", color: "#0090FF" },
-  31: { name: "Esteban Ocon", team: "Alpine", color: "#0090FF" }
-}
+  31: { name: "Esteban Ocon", team: "Alpine", color: "#0090FF" },
+};

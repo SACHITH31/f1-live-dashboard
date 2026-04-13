@@ -1,6 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
-import Dashboard from "./pages/Dashboard"
-import RacePage from "./pages/RacePage"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import RacePage from "./pages/RacePage";
 
 function App() {
   return (
@@ -10,7 +10,7 @@ function App() {
         <Route path="/race" element={<RacePage />} />
       </Routes>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;

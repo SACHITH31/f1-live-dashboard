@@ -1,137 +1,151 @@
-import { useEffect, useRef } from "react"
-import { driversData } from "../../services/teams"
-import "./Canvas.css"
+import { useEffect, useRef } from "react";
+import { driversData } from "../../services/teams";
+import "./Canvas.css";
 
 function Canvas({ cars, trackImage, selectedDriver, setSelectedDriver }) {
-  const trackImgRef = useRef(null)
-  const canvasRef = useRef(null)
-  const prevCarsRef = useRef([])
+  const canvasRef = useRef(null);
+  const trackImgRef = useRef(null);
 
-  const scale = (val, min, max, size) => {
-    if (max - min === 0) return size / 2
-    return ((val - min) / (max - min)) * size
-  }
+  const prevCarsRef = useRef({});
+  const boundsRef = useRef(null);
+
+  // 🔥 NORMALIZE FUNCTION
+  const normalize = (val, min, max, size) => {
+    if (max - min === 0) return size / 2;
+    return ((val - min) / (max - min)) * size;
+  };
+
+  // 🖼️ LOAD TRACK IMAGE
   useEffect(() => {
-  if (!trackImage) return
+    if (!trackImage) return;
 
-  const img = new Image()
-  img.src = trackImage
+    const img = new Image();
+    img.src = trackImage;
 
-  img.onload = () => {
-    trackImgRef.current = img
-  }
-}, [trackImage])
+    img.onload = () => {
+      trackImgRef.current = img;
+    };
+  }, [trackImage]);
 
+  // 📊 CALCULATE BOUNDS (IMPORTANT)
   useEffect(() => {
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext("2d")
+    if (!cars || cars.length === 0) return;
 
-    let animationFrameId
+    const xs = cars.map((c) => c.x);
+    const ys = cars.map((c) => c.y);
+
+    boundsRef.current = {
+      minX: Math.min(...xs),
+      maxX: Math.max(...xs),
+      minY: Math.min(...ys),
+      maxY: Math.max(...ys),
+    };
+  }, [cars]);
+
+  // 🎬 ANIMATION LOOP
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    let animationFrameId;
 
     const animate = () => {
+      // 🧼 CLEAR / DRAW BACKGROUND
       if (trackImgRef.current) {
-  ctx.drawImage(trackImgRef.current, 0, 0, canvas.width, canvas.height)
-} else {
-  ctx.fillStyle = "#0a0b0d"
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
-}
-
-      if (!cars || cars.length === 0) {
-        ctx.fillStyle = "#888"
-        ctx.font = "16px Arial"
-        // ctx.fillText("No Live Race Data", 300, 250)
-        return
+        ctx.drawImage(trackImgRef.current, 0, 0, canvas.width, canvas.height);
+      } else {
+        ctx.fillStyle = "#0a0b0d";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
 
-      const xs = cars.map(c => c.x)
-      const ys = cars.map(c => c.y)
+      if (!cars || cars.length === 0 || !boundsRef.current) {
+        animationFrameId = requestAnimationFrame(animate);
+        return;
+      }
 
-      const minX = Math.min(...xs)
-      const maxX = Math.max(...xs)
-      const minY = Math.min(...ys)
-      const maxY = Math.max(...ys)
+      const b = boundsRef.current;
 
-      cars.forEach((car, i) => {
-        const prev = prevCarsRef.current[i] || car
+      cars.forEach((car) => {
+        if (car.x == null || car.y == null) return;
 
-        const smoothX = prev.x + (car.x - prev.x) * 0.1
-        const smoothY = prev.y + (car.y - prev.y) * 0.1
+        // 🧠 PREVIOUS POSITION (PER DRIVER ✅)
+        const prev = prevCarsRef.current[car.driver] || car;
 
-        const x = scale(smoothX, minX, maxX, canvas.width)
-        const y = scale(smoothY, minY, maxY, canvas.height)
+        // 🔥 SMOOTH INTERPOLATION
+        const smoothX = prev.x + (car.x - prev.x) * 0.1;
+        const smoothY = prev.y + (car.y - prev.y) * 0.1;
 
-        const driver = driversData[car.driver]
-        const color = driver?.color || "#e10600"
+        // 🎯 NORMALIZE TO CANVAS
+        const x = normalize(smoothX, b.minX, b.maxX, canvas.width);
+        const y =
+          canvas.height - normalize(smoothY, b.minY, b.maxY, canvas.height);
 
-        // 🚗 Draw car
-        ctx.beginPath()
-        ctx.arc(x, y, 6, 0, 2 * Math.PI)
+        const driver = driversData[car.driver];
+        const color = driver?.color || "#e10600";
 
-        ctx.shadowBlur = 10
-        ctx.shadowColor = color
+        // 🚗 DRAW CAR
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, 2 * Math.PI);
 
-        ctx.fillStyle = color
-        ctx.fill()
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = color;
 
-        ctx.shadowBlur = 0
+        ctx.fillStyle = color;
+        ctx.fill();
 
-        // 🟢 Label
-        ctx.fillStyle = "#e0e0e0"
-        ctx.font = "10px Arial"
-        ctx.fillText(car.driver, x + 8, y)
+        ctx.shadowBlur = 0;
 
-        // 🔥 Highlight
+        // 🏷️ DRIVER LABEL
+        ctx.fillStyle = "#e0e0e0";
+        ctx.font = "10px Arial";
+        ctx.fillText(car.driver, x + 8, y);
+
+        // 🔥 SELECTED DRIVER HIGHLIGHT
         if (selectedDriver === car.driver) {
-          ctx.beginPath()
-          ctx.arc(x, y, 10, 0, 2 * Math.PI)
-          ctx.strokeStyle = "#ffffff"
-          ctx.lineWidth = 2
-          ctx.stroke()
+          ctx.beginPath();
+          ctx.arc(x, y, 10, 0, 2 * Math.PI);
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 2;
+          ctx.stroke();
         }
 
-        // Save smooth pos
-        prevCarsRef.current[i] = { x: smoothX, y: smoothY }
-      })
+        // 💾 SAVE SMOOTH POSITION
+        prevCarsRef.current[car.driver] = {
+          x: smoothX,
+          y: smoothY,
+          canvasX: x,
+          canvasY: y,
+        };
+      });
 
-      animationFrameId = requestAnimationFrame(animate)
-    }
+      animationFrameId = requestAnimationFrame(animate);
+    };
 
-    animate()
+    animate();
 
-    return () => cancelAnimationFrame(animationFrameId)
-  }, [cars, selectedDriver])
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [cars, selectedDriver]);
 
-  // 🖱️ CLICK
+  // 🖱️ CLICK HANDLER (FIXED ✅)
   const handleClick = (e) => {
-    const canvas = canvasRef.current
-    const rect = canvas.getBoundingClientRect()
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
 
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
-    cars.forEach((car, i) => {
-      const prev = prevCarsRef.current[i]
-      if (!prev) return
-
-      const dx = scale(prev.x, 0, 1000, canvas.width)
-      const dy = scale(prev.y, 0, 1000, canvas.height)
-
-      const dist = Math.sqrt((x - dx) ** 2 + (y - dy) ** 2)
+    Object.entries(prevCarsRef.current).forEach(([driver, pos]) => {
+      const dist = Math.sqrt((x - pos.canvasX) ** 2 + (y - pos.canvasY) ** 2);
 
       if (dist < 10) {
-        setSelectedDriver(car.driver)
+        setSelectedDriver(Number(driver));
       }
-    })
-  }
+    });
+  };
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={800}
-      height={500}
-      onClick={handleClick}
-    />
-  )
+    <canvas ref={canvasRef} width={800} height={500} onClick={handleClick} />
+  );
 }
 
-export default Canvas
+export default Canvas;

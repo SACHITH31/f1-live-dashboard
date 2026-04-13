@@ -1,19 +1,18 @@
-import "./Leaderboard.css"
+import "./Leaderboard.css";
 
 function Leaderboard({ cars, drivers, selectedDriver, setSelectedDriver }) {
-
   // 🔥 Merge car + driver data
   const merged = cars
-  .map(car => {
-    const driver = drivers.find(d => d.driver_number == car.driver)
-    return {
-      ...car,
-      name: driver?.full_name || `Driver ${car.driver}`,
-      team: driver?.team_name || "Unknown",
-      color: driver?.team_colour || "#e10600"
-    }
-  })
-  .sort((a, b) => a.y - b.y) // 🔥 ranking logic
+    .map((car) => {
+      const driver = drivers.find((d) => d.driver_number == car.driver);
+      return {
+        ...car,
+        name: driver?.full_name || `Driver ${car.driver}`,
+        team: driver?.team_name || "Unknown",
+        color: driver?.team_colour || "#e10600",
+      };
+    })
+    .sort((a, b) => a.y - b.y); // 🔥 ranking logic
 
   return (
     <div className="leaderboard">
@@ -30,10 +29,7 @@ function Leaderboard({ cars, drivers, selectedDriver, setSelectedDriver }) {
           >
             <span className="position">{i + 1}</span>
 
-            <div
-              className="color-bar"
-              style={{ background: d.color }}
-            ></div>
+            <div className="color-bar" style={{ background: d.color }}></div>
 
             <div className="info">
               <p className="name">{d.name}</p>
@@ -43,7 +39,7 @@ function Leaderboard({ cars, drivers, selectedDriver, setSelectedDriver }) {
         ))
       )}
     </div>
-  )
+  );
 }
 
-export default Leaderboard
+export default Leaderboard;
