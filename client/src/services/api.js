@@ -8,12 +8,14 @@ export const getRaceData = async () => {
     const res = await fetch("http://localhost:5000/api/race")
 
     if (!res.ok) {
-      throw new Error("Network response not ok")
+      throw new Error("API failed")
     }
 
-    return await res.json()
-  } catch (error) {
-    console.log("Frontend fetch error:", error.message)
+    const data = await res.json()
+    return data
+
+  } catch (err) {
+    console.log("Frontend API Error:", err)
     return null
   }
 }
