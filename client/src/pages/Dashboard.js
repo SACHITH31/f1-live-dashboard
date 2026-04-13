@@ -1,69 +1,72 @@
-import { useEffect, useState } from "react";
-import Navbar from "../components/Navbar/Navbar";
-import Leaderboard from "../components/Leaderboard/Leaderboard";
-import Canvas from "../components/Canvas/Canvas";
-import RaceInfo from "../components/RaceInfo/RaceInfo";
-import { getCars } from "../services/api";
-import "./Dashboard.css";
+import { useEffect, useState } from "react"
+import Navbar from "../components/Navbar/Navbar"
+import Leaderboard from "../components/Leaderboard/Leaderboard"
+import Canvas from "../components/Canvas/Canvas"
+import RaceInfo from "../components/RaceInfo/RaceInfo"
+import { getRaceData } from "../services/api"
+import "./Dashboard.css"
 
 function Dashboard() {
-  const [cars, setCars] = useState([]);
-  const [selectedDriver, setSelectedDriver] = useState(null);
+  const [cars, setCars] = useState([])
+  const [race, setRace] = useState(null)
+  const [isLive, setIsLive] = useState(false)
 
   useEffect(() => {
-    let isMounted = true;
+  let interval
 
-    const fetchCars = async () => {
-      try {
-        const data = await getCars();
+  const fetchData = async () => {
+    const data = await getRaceData()
+    if (!data) return
 
-        if (data && Array.isArray(data.cars)) {
-          setCars(data.cars);
-        }
-      } catch (err) {
-        console.log("Error fetching cars:", err);
-      }
-    };
+    setIsLive(data.isLive)
 
-    // ✅ initial fetch (important)
-    fetchCars();
+    if (Array.isArray(data.cars)) {
+      setCars(data.cars)
+    }
 
-    // ✅ controlled interval
-    const interval = setInterval(fetchCars, 3000);
+    setRace(data.race)
 
-    return () => {
-      isMounted = false;
-      clearInterval(interval);
-    };
-  }, []);
+    // 🔥 Only start interval if LIVE
+    if (data.isLive && !interval) {
+      interval = setInterval(fetchData, 3000)
+    }
+  }
+
+  fetchData()
+
+  return () => clearInterval(interval)
+}, [])
 
   return (
     <div className="dashboard">
       <Navbar />
 
-      <div className="main">
-        <div className="left">
-          <Leaderboard
-            cars={cars}
-            selectedDriver={selectedDriver}
-            setSelectedDriver={setSelectedDriver}
-          />
+      {/* 🟢 LIVE */}
+      {isLive && (
+        <div className="main">
+          <Leaderboard cars={cars} />
+          <Canvas cars={cars} />
+          <RaceInfo race={race} isLive={true} />
         </div>
+      )}
 
-        <div className="center">
-          <Canvas
-            cars={cars}
-            selectedDriver={selectedDriver}
-            setSelectedDriver={setSelectedDriver}
-          />
+      {/* 🔴 NOT LIVE */}
+      {!isLive && race && (
+        <div className="no-live">
+          <h2>Next Race</h2>
+          <p>{race.session_name}</p>
+          <p>{race.date_start}</p>
         </div>
+      )}
 
-        <div className="right">
-          <RaceInfo />
+      {/* ⚠️ NO DATA */}
+      {!isLive && !race && (
+        <div className="no-data">
+          <p>No race data available</p>
         </div>
-      </div>
+      )}
     </div>
-  );
+  )
 }
 
-export default Dashboard;
+export default Dashboard

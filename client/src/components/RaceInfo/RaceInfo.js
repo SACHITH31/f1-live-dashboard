@@ -1,50 +1,33 @@
-import { useEffect, useState } from "react"
-import { getRace } from "../../services/api"
 import "./RaceInfo.css"
 
-function RaceInfo() {
-  const [race, setRace] = useState(null)
-  const [timeLeft, setTimeLeft] = useState("")
-
-  useEffect(() => {
-    getRace().then(data => setRace(data))
-  }, [])
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!race) return
-
-      const now = new Date()
-      const raceTime = new Date(race.time)
-
-      const diff = raceTime - now
-
-      if (diff <= 0) {
-        setTimeLeft("LIVE")
-        return
-      }
-
-      const hours = Math.floor(diff / (1000 * 60 * 60))
-      const mins = Math.floor((diff / (1000 * 60)) % 60)
-      const secs = Math.floor((diff / 1000) % 60)
-
-      setTimeLeft(`${hours}h ${mins}m ${secs}s`)
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [race])
-
-  if (!race) return null
+function RaceInfo({ race, isLive }) {
+  if (!race && !isLive) {
+    return (
+      <div className="race-info">
+        <p>No race data available</p>
+      </div>
+    )
+  }
 
   return (
-    <div className="raceinfo">
-      <h2>RACE INFO</h2>
-
-      <p>{race.name}</p>
-
-      <p className="time">
-        {race.isLive ? "LIVE NOW 🔴" : timeLeft}
-      </p>
+    <div className="race-info">
+      {isLive ? (
+        <>
+          <h2>LIVE RACE 🔴</h2>
+          {race && (
+            <>
+              <p>{race.session_name}</p>
+              <p>{race.date_start}</p>
+            </>
+          )}
+        </>
+      ) : (
+        <>
+          <h2>UPCOMING RACE</h2>
+          <p>{race?.session_name}</p>
+          <p>{race?.date_start}</p>
+        </>
+      )}
     </div>
   )
 }
