@@ -1,41 +1,41 @@
-import { useEffect, useState } from "react"
-import Navbar from "../components/Navbar/Navbar"
-import Leaderboard from "../components/Leaderboard/Leaderboard"
-import Canvas from "../components/Canvas/Canvas"
-import RaceInfo from "../components/RaceInfo/RaceInfo"
-import { getCars } from "../services/api"
-import "./Dashboard.css"
+import { useEffect, useState } from "react";
+import Navbar from "../components/Navbar/Navbar";
+import Leaderboard from "../components/Leaderboard/Leaderboard";
+import Canvas from "../components/Canvas/Canvas";
+import RaceInfo from "../components/RaceInfo/RaceInfo";
+import { getCars } from "../services/api";
+import "./Dashboard.css";
 
 function Dashboard() {
-  const [cars, setCars] = useState([])
-  const [selectedDriver, setSelectedDriver] = useState(null)
+  const [cars, setCars] = useState([]);
+  const [selectedDriver, setSelectedDriver] = useState(null);
 
   useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
 
     const fetchCars = async () => {
       try {
-        const data = await getCars()
+        const data = await getCars();
 
-        if (isMounted && Array.isArray(data)) {
-          setCars(data)
+        if (data && Array.isArray(data.cars)) {
+          setCars(data.cars);
         }
       } catch (err) {
-        console.log("Error fetching cars:", err)
+        console.log("Error fetching cars:", err);
       }
-    }
+    };
 
     // ✅ initial fetch (important)
-    fetchCars()
+    fetchCars();
 
     // ✅ controlled interval
-    const interval = setInterval(fetchCars, 3000)
+    const interval = setInterval(fetchCars, 3000);
 
     return () => {
-      isMounted = false
-      clearInterval(interval)
-    }
-  }, [])
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   return (
     <div className="dashboard">
@@ -63,7 +63,7 @@ function Dashboard() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Dashboard
+export default Dashboard;

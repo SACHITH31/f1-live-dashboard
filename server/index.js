@@ -10,35 +10,62 @@ app.get("/api/test", (req, res) => {
     res.json({ message: "Backend is working 🚀" })
 })
 
+const USE_MOCK = true   // 👈 ADD THIS AT TOP (outside route)
+
 app.get("/api/cars", async (req, res) => {
     try {
         const response = await axios.get(
             "https://api.openf1.org/v1/positions?session_key=latest"
         )
 
+        // ✅ IF NO LIVE DATA
         if (!Array.isArray(response.data) || response.data.length === 0) {
-            throw new Error("No live data")
+
+            if (USE_MOCK) {
+                const mockCars = Array.from({ length: 10 }).map((_, i) => ({
+                    driver: i + 1
+                }))
+
+                return res.json({
+                    isLive: true,
+                    cars: mockCars
+                })
+            }
+
+            return res.json({
+                isLive: false,
+                cars: []
+            })
         }
 
+        // ✅ REAL DATA
         const cars = response.data.map(car => ({
-            driver: car.driver_number,
-            x: car.x,
-            y: car.y
+            driver: car.driver_number
         }))
 
-        res.json(cars)
+        res.json({
+            isLive: true,
+            cars
+        })
 
     } catch (error) {
-        console.log("Using fallback data")
 
-        // 🔥 Fallback simulated data
-        const mockCars = Array.from({ length: 10 }).map((_, i) => ({
-            driver: i + 1,
-            x: Math.random() * 1000,
-            y: Math.random() * 1000
-        }))
+        // ✅ HANDLE ERROR WITH MOCK
+        if (USE_MOCK) {
+            const mockCars = Array.from({ length: 10 }).map((_, i) => ({
+                driver: i + 1
+            }))
 
-        res.json(mockCars)
+            return res.json({
+                isLive: true,
+                cars: mockCars
+            })
+        }
+
+        return res.json({
+            isLive: false,
+            cars: []
+        })
     }
 })
 
