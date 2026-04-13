@@ -17,3 +17,51 @@
   border-radius: 10px;
   border: 1px solid #222;
 }
+
+.race-page {
+  background: #0a0b0d;
+  min-height: 100vh;
+  color: white;
+}
+
+/* LIVE LAYOUT */
+.race-layout {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
+  padding: 20px;
+}
+
+.left, .right {
+  background: #16191e;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.center {
+  background: #16191e;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+/* UPCOMING */
+.race-details {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.track-box {
+  margin: 20px auto;
+  width: 800px;
+  background: #16191e;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.drivers-box {
+  margin: 20px auto;
+  width: 800px;
+  background: #16191e;
+  padding: 20px;
+  border-radius: 10px;
+}
