@@ -13,48 +13,55 @@ function RacePage() {
   const [drivers, setDrivers] = useState([]);
   const [selectedDriver, setSelectedDriver] = useState(null);
 
-  // 🔥 FETCH RACE DATA
+  // 🔥 FETCH RACE DATA + POLLING (FIXED)
   useEffect(() => {
-    let interval;
+    let interval = null;
 
     const fetchData = async () => {
-      const data = await getRaceData();
-      if (!data) return;
+      try {
+        const data = await getRaceData();
+        if (!data) return;
 
-      setRace(data.race);
-      setIsLive(data.isLive);
-      setTrackImage(data.trackImage || null);
+        setRace(data.race);
+        setIsLive(data.isLive);
+        setTrackImage(data.trackImage || null);
 
-      if (Array.isArray(data.cars)) {
-        setCars(data.cars);
-      }
+        if (Array.isArray(data.cars)) {
+          setCars(data.cars);
+        }
 
-      if (data.isLive) {
-        clearInterval(interval);
-        interval = setInterval(fetchData, 3000);
+        // ✅ start polling only once
+        if (data.isLive && !interval) {
+          interval = setInterval(fetchData, 3000);
+        }
+
+      } catch (err) {
+        console.log("Race fetch error:", err);
       }
     };
 
     fetchData();
 
-    return () => clearInterval(interval);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, []);
 
-  // 🔥 FETCH DRIVERS (ONLY ONCE)
+  // 🔥 FETCH DRIVERS
   useEffect(() => {
     const fetchDrivers = async () => {
-      const data = await getDrivers();
-      if (Array.isArray(data)) {
-        setDrivers(data);
+      try {
+        const data = await getDrivers();
+        if (Array.isArray(data)) {
+          setDrivers(data);
+        }
+      } catch (err) {
+        console.log("Drivers fetch error:", err);
       }
     };
 
     fetchDrivers();
   }, []);
-
-  const formattedDate = race?.date_start
-    ? new Date(race.date_start).toLocaleString()
-    : "TBD";
 
   const raceDate = race?.date_start
     ? new Date(race.date_start).toLocaleString()
@@ -66,6 +73,7 @@ function RacePage() {
 
       {isLive ? (
         <div className="race-layout">
+          
           <div className="left">
             <Leaderboard
               cars={cars}
@@ -78,6 +86,7 @@ function RacePage() {
           <div className="center">
             <Canvas
               cars={cars}
+              drivers={drivers}
               trackImage={trackImage}
               selectedDriver={selectedDriver}
               setSelectedDriver={setSelectedDriver}
@@ -90,9 +99,11 @@ function RacePage() {
               {race?.location} - {race?.country_name}
             </p>
           </div>
+
         </div>
       ) : (
         <div className="race-details">
+          
           <h2>UPCOMING RACE</h2>
           <p>
             {race?.location} - {race?.country_name}
@@ -100,18 +111,17 @@ function RacePage() {
           <p>{raceDate}</p>
 
           <div className="track-box">
-            {/* Ensure your Canvas component actually uses the trackImage prop to draw an <img> or background */}
             <Canvas cars={[]} trackImage={trackImage} />
 
-            {/* Move the message here so it doesn't break the layout */}
-            {!isLive && (
-              <div className="no-live-overlay">No Live Race Data</div>
-            )}
+            <div className="no-live-overlay">
+              No Live Race Data
+            </div>
           </div>
 
           <div className="drivers-box">
             <p>Drivers will be available during live race</p>
           </div>
+
         </div>
       )}
     </div>

@@ -1,13 +1,26 @@
 import { useEffect, useRef } from "react";
-import { driversData } from "../../services/teams";
 import "./Canvas.css";
 
-function Canvas({ cars, trackImage, selectedDriver, setSelectedDriver }) {
+function Canvas({ cars, drivers, trackImage, selectedDriver, setSelectedDriver }) {
   const canvasRef = useRef(null);
   const trackImgRef = useRef(null);
 
   const prevCarsRef = useRef({});
   const boundsRef = useRef(null);
+
+  // 🎨 TEAM COLORS (minimal mapping)
+  const teamColors = {
+    "Red Bull Racing": "#1E41FF",
+    "Ferrari": "#DC0000",
+    "Mercedes": "#00D2BE",
+    "McLaren": "#FF8700",
+    "Aston Martin": "#006F62",
+    "Alpine": "#0090FF",
+    "Williams": "#005AFF",
+    "RB": "#6692FF",
+    "Kick Sauber": "#52E252",
+    "Haas F1 Team": "#FFFFFF"
+  };
 
   // 🔥 NORMALIZE FUNCTION
   const normalize = (val, min, max, size) => {
@@ -27,12 +40,12 @@ function Canvas({ cars, trackImage, selectedDriver, setSelectedDriver }) {
     };
   }, [trackImage]);
 
-  // 📊 CALCULATE BOUNDS (IMPORTANT)
+  // 📊 CALCULATE BOUNDS
   useEffect(() => {
     if (!cars || cars.length === 0) return;
 
-    const xs = cars.map((c) => c.x);
-    const ys = cars.map((c) => c.y);
+    const xs = cars.map(c => c.x);
+    const ys = cars.map(c => c.y);
 
     boundsRef.current = {
       minX: Math.min(...xs),
@@ -50,7 +63,7 @@ function Canvas({ cars, trackImage, selectedDriver, setSelectedDriver }) {
     let animationFrameId;
 
     const animate = () => {
-      // 🧼 CLEAR / DRAW BACKGROUND
+      // 🧼 BACKGROUND
       if (trackImgRef.current) {
         ctx.drawImage(trackImgRef.current, 0, 0, canvas.width, canvas.height);
       } else {
@@ -68,20 +81,26 @@ function Canvas({ cars, trackImage, selectedDriver, setSelectedDriver }) {
       cars.forEach((car) => {
         if (car.x == null || car.y == null) return;
 
-        // 🧠 PREVIOUS POSITION (PER DRIVER ✅)
+        // 🧠 GET DRIVER FROM API
+        const driverInfo = drivers?.find(
+          d => d.driver_number === car.driver
+        );
+
+        const teamName = driverInfo?.team_name || "Unknown";
+        const color = teamColors[teamName] || "#e10600";
+
+        // 🧠 PREVIOUS POSITION
         const prev = prevCarsRef.current[car.driver] || car;
 
-        // 🔥 SMOOTH INTERPOLATION
+        // 🔥 SMOOTH MOVEMENT
         const smoothX = prev.x + (car.x - prev.x) * 0.1;
         const smoothY = prev.y + (car.y - prev.y) * 0.1;
 
-        // 🎯 NORMALIZE TO CANVAS
+        // 🎯 NORMALIZE
         const x = normalize(smoothX, b.minX, b.maxX, canvas.width);
         const y =
-          canvas.height - normalize(smoothY, b.minY, b.maxY, canvas.height);
-
-        const driver = driversData[car.driver];
-        const color = driver?.color || "#e10600";
+          canvas.height -
+          normalize(smoothY, b.minY, b.maxY, canvas.height);
 
         // 🚗 DRAW CAR
         ctx.beginPath();
@@ -95,12 +114,18 @@ function Canvas({ cars, trackImage, selectedDriver, setSelectedDriver }) {
 
         ctx.shadowBlur = 0;
 
-        // 🏷️ DRIVER LABEL
+        // 🏷️ DRIVER LABEL (API)
         ctx.fillStyle = "#e0e0e0";
         ctx.font = "10px Arial";
-        ctx.fillText(car.driver, x + 8, y);
 
-        // 🔥 SELECTED DRIVER HIGHLIGHT
+        const label =
+          driverInfo?.name_acronym ||
+          driverInfo?.last_name ||
+          car.driver;
+
+        ctx.fillText(label, x + 8, y);
+
+        // 🔥 SELECTED DRIVER
         if (selectedDriver === car.driver) {
           ctx.beginPath();
           ctx.arc(x, y, 10, 0, 2 * Math.PI);
@@ -109,7 +134,7 @@ function Canvas({ cars, trackImage, selectedDriver, setSelectedDriver }) {
           ctx.stroke();
         }
 
-        // 💾 SAVE SMOOTH POSITION
+        // 💾 SAVE POSITION
         prevCarsRef.current[car.driver] = {
           x: smoothX,
           y: smoothY,
@@ -124,9 +149,9 @@ function Canvas({ cars, trackImage, selectedDriver, setSelectedDriver }) {
     animate();
 
     return () => cancelAnimationFrame(animationFrameId);
-  }, [cars, selectedDriver]);
+  }, [cars, drivers, selectedDriver]);
 
-  // 🖱️ CLICK HANDLER (FIXED ✅)
+  // 🖱️ CLICK HANDLER
   const handleClick = (e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
@@ -144,7 +169,12 @@ function Canvas({ cars, trackImage, selectedDriver, setSelectedDriver }) {
   };
 
   return (
-    <canvas ref={canvasRef} width={800} height={500} onClick={handleClick} />
+    <canvas
+      ref={canvasRef}
+      width={800}
+      height={500}
+      onClick={handleClick}
+    />
   );
 }
 
