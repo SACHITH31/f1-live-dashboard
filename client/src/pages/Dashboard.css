@@ -55,3 +55,15 @@ body {
 .no-data {
   color: #999;
 }
+
+.no-data {
+  color: #888;
+  font-size: 18px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.5 }
+  50% { opacity: 1 }
+  100% { opacity: 0.5 }
+}
