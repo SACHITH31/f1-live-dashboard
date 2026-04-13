@@ -26,9 +26,13 @@ function Dashboard() {
 
     setRace(data.race)
 
-    // 🔥 Only start interval if LIVE
-    if (data.isLive && !interval) {
+    // 🟢 If LIVE → fast polling
+    if (data.isLive) {
+      clearInterval(interval)
       interval = setInterval(fetchData, 3000)
+    } else {
+      clearInterval(interval)
+      interval = setInterval(fetchData, 60000) // 🔥 every 1 minute
     }
   }
 
