@@ -1,16 +1,16 @@
-.raceinfo {
+.race-info {
+  background: #16191e;
   padding: 20px;
+  border-radius: 10px;
   color: #e0e0e0;
 }
 
-.raceinfo h2 {
+.race-info h2 {
   color: #e10600;
-  margin-bottom: 20px;
 }
 
-.time {
-  margin-top: 20px;
-  font-size: 22px;
-  color: #e10600;
-  font-weight: bold;
+.countdown {
+  color: #ff0000;
+  font-size: 24px;
+  margin-top: 10px;
 }

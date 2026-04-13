@@ -1,27 +1,57 @@
-.dashboard {
-  height: 100vh;
-  background-color: #0a0b0d;
+body {
+  background: #0a0b0d;
+  margin: 0;
+  font-family: Arial, sans-serif;
 }
 
-.main {
-  display: grid;
-  grid-template-columns: 20% 60% 20%;
-  height: calc(100vh - 70px);
-}
-
-.left,
-.right {
-  background-color: #16191e;
-  border-right: 1px solid #222;
-}
-
-.right {
-  border-left: 1px solid #222;
-  border-right: none;
-}
-
-.center {
+.dashboard-container {
   display: flex;
   justify-content: center;
-  align-items: center;
+  margin-top: 80px;
+}
+
+.race-card {
+  background: #16191e;
+  padding: 30px;
+  border-radius: 12px;
+  width: 400px;
+  text-align: center;
+  cursor: pointer;
+  border: 1px solid #222;
+  transition: 0.3s;
+}
+
+.race-card:hover {
+  box-shadow: 0px 0px 20px rgba(225, 6, 0, 0.3);
+}
+
+.race-card h2 {
+  color: #e10600;
+}
+
+.race-card p {
+  color: #ccc;
+}
+
+.race-card h3 {
+  color: #ff0000;
+  margin-top: 10px;
+}
+
+.race-card button {
+  margin-top: 15px;
+  padding: 10px 15px;
+  background: #e10600;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.live {
+  border: 1px solid red;
+}
+
+.no-data {
+  color: #999;
 }

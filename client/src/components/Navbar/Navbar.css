@@ -1,14 +1,12 @@
 .navbar {
-  height: 70px;
-  background-color: #0a0b0d;
-  border-bottom: 2px solid #e10600;
-  display: flex;
-  align-items: center;
-  padding-left: 20px;
+  background: #0a0b0d;
+  padding: 15px 30px;
+  border-bottom: 1px solid #222;
 }
 
 .navbar h1 {
   color: #e10600;
-  font-size: 20px;
-  letter-spacing: 2px;
+  cursor: pointer;
+  font-size: 22px;
+  letter-spacing: 1px;
 }

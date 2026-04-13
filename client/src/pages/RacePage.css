@@ -1,0 +1,19 @@
+.race-page {
+  background: #0a0b0d;
+  min-height: 100vh;
+  color: white;
+  text-align: center;
+}
+
+.race-details {
+  margin-top: 50px;
+}
+
+.track, .drivers {
+  background: #16191e;
+  margin: 20px auto;
+  padding: 20px;
+  width: 70%;
+  border-radius: 10px;
+  border: 1px solid #222;
+}

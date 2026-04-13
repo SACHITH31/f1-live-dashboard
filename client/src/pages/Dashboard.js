@@ -1,74 +1,73 @@
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import Navbar from "../components/Navbar/Navbar"
-import Leaderboard from "../components/Leaderboard/Leaderboard"
-import Canvas from "../components/Canvas/Canvas"
-import RaceInfo from "../components/RaceInfo/RaceInfo"
 import { getRaceData } from "../services/api"
 import "./Dashboard.css"
 
 function Dashboard() {
-  const [cars, setCars] = useState([])
   const [race, setRace] = useState(null)
   const [isLive, setIsLive] = useState(false)
+  const [timeLeft, setTimeLeft] = useState("")
+  const navigate = useNavigate()
 
   useEffect(() => {
-  let interval
+    const fetchData = async () => {
+      const data = await getRaceData()
+      if (!data) return
 
-  const fetchData = async () => {
-    const data = await getRaceData()
-    if (!data) return
-
-    setIsLive(data.isLive)
-
-    if (Array.isArray(data.cars)) {
-      setCars(data.cars)
+      setIsLive(data.isLive)
+      setRace(data.race)
     }
 
-    setRace(data.race)
+    fetchData()
+  }, [])
 
-    // 🟢 If LIVE → fast polling
-    if (data.isLive) {
-      clearInterval(interval)
-      interval = setInterval(fetchData, 3000)
-    } else {
-      clearInterval(interval)
-      interval = setInterval(fetchData, 60000) // 🔥 every 1 minute
-    }
-  }
+  useEffect(() => {
+    if (!race || isLive) return
 
-  fetchData()
+    const interval = setInterval(() => {
+      const now = new Date()
+      const raceTime = new Date(race.date_start)
+      const diff = raceTime - now
 
-  return () => clearInterval(interval)
-}, [])
+      if (diff <= 0) {
+        setTimeLeft("Starting soon...")
+        return
+      }
+
+      const h = Math.floor(diff / (1000 * 60 * 60))
+      const m = Math.floor((diff / (1000 * 60)) % 60)
+      const s = Math.floor((diff / 1000) % 60)
+
+      setTimeLeft(`${h}h ${m}m ${s}s`)
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [race, isLive])
 
   return (
     <div className="dashboard">
       <Navbar />
 
-      {/* 🟢 LIVE */}
-      {isLive && (
-        <div className="main">
-          <Leaderboard cars={cars} />
-          <Canvas cars={cars} />
-          <RaceInfo race={race} isLive={true} />
-        </div>
-      )}
-
-      {/* 🔴 NOT LIVE */}
-      {!isLive && race && (
-        <div className="no-live">
-          <h2>Next Race</h2>
-          <p>{race.session_name}</p>
-          <p>{race.date_start}</p>
-        </div>
-      )}
-
-      {/* ⚠️ NO DATA */}
-      {!isLive && !race && (
-        <div className="no-data">
-          <p>No race data available</p>
-        </div>
-      )}
+      <div className="dashboard-container">
+        {isLive ? (
+          <div className="race-card live" onClick={() => navigate("/race")}>
+            <h2>LIVE NOW 🔴</h2>
+            <p>{race?.location} - {race?.country_name}</p>
+            <button>Go to Live Race →</button>
+          </div>
+        ) : race ? (
+          <div className="race-card" onClick={() => navigate("/race")}>
+            <h2>UPCOMING RACE</h2>
+            <p>{race.location} - {race.country_name}</p>
+            <p>{new Date(race.date_start).toLocaleString()}</p>
+            <h3>{timeLeft}</h3>
+            <button>View Race Details →</button>
+          </div>
+        ) : (
+          <p className="no-data">No race data available</p>
+        )}
+      </div>
     </div>
   )
 }
