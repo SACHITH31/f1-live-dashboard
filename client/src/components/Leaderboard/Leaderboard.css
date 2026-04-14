@@ -44,3 +44,61 @@
   border: 1px solid #e10600;
   box-shadow: 0 0 10px rgba(225, 6, 0, 0.3);
 }
+
+.leaderboard {
+  padding: 15px;
+  background: #111;
+  color: #fff;
+  border-radius: 10px;
+}
+
+.driver-row {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  margin: 6px 0;
+  background: #1a1a1a;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.driver-row:hover {
+  background: #222;
+}
+
+.driver-row.active {
+  border: 1px solid #fff;
+}
+
+.pos {
+  width: 30px;
+  font-weight: bold;
+}
+
+.color-bar {
+  width: 4px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+.team-logo {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.team {
+  font-size: 12px;
+  color: #aaa;
+}

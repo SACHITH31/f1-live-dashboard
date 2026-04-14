@@ -1,43 +1,57 @@
 import "./Leaderboard.css";
+import teamLogos from "../../services/teamLogos";
 
 function Leaderboard({ cars, drivers, selectedDriver, setSelectedDriver }) {
-  // 🔥 Merge car + driver data
-  const merged = cars
-    .map((car) => {
-      const driver = drivers.find((d) => d.driver_number == car.driver);
-      return {
-        ...car,
-        name: driver?.full_name || `Driver ${car.driver}`,
-        team: driver?.team_name || "Unknown",
-        color: driver?.team_colour || "#e10600",
-      };
-    })
-    .sort((a, b) => a.y - b.y); // 🔥 ranking logic
+
+  // 🧠 Merge car + driver data
+  const merged = cars.map((car, index) => {
+    const driverInfo = drivers.find(
+      (d) => d.driver_number === car.driver
+    );
+
+    return {
+      position: index + 1,
+      driver: car.driver,
+      name: driverInfo?.full_name || "Unknown",
+      team: driverInfo?.team_name || "Unknown",
+      color: `#${driverInfo?.team_colour}` || "#e10600",
+      logo: teamLogos[driverInfo?.team_name] || null,
+    };
+  });
 
   return (
     <div className="leaderboard">
-      <h2>DRIVERS</h2>
+      <h2>🏁 Leaderboard</h2>
 
-      {merged.length === 0 ? (
-        <p className="no-data">No live data</p>
-      ) : (
-        merged.map((d, i) => (
+      {merged.map((d) => (
+        <div
+          key={d.driver}
+          className={`driver-row ${
+            selectedDriver === d.driver ? "active" : ""
+          }`}
+          onClick={() => setSelectedDriver(d.driver)}
+        >
+          {/* POSITION */}
+          <div className="pos">{d.position}</div>
+
+          {/* COLOR BAR */}
           <div
-            key={d.driver}
-            className={`driver ${selectedDriver === d.driver ? "active" : ""}`}
-            onClick={() => setSelectedDriver(d.driver)}
-          >
-            <span className="position">{i + 1}</span>
+            className="color-bar"
+            style={{ background: d.color }}
+          />
 
-            <div className="color-bar" style={{ background: d.color }}></div>
+          {/* LOGO */}
+          {d.logo && (
+            <img className="team-logo" src={d.logo} alt="logo" />
+          )}
 
-            <div className="info">
-              <p className="name">{d.name}</p>
-              <p className="team">{d.team}</p>
-            </div>
+          {/* DRIVER INFO */}
+          <div className="info">
+            <span className="name">{d.name}</span>
+            <span className="team">{d.team}</span>
           </div>
-        ))
-      )}
+        </div>
+      ))}
     </div>
   );
 }
