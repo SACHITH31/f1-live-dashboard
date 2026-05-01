@@ -1,4 +1,8 @@
 .navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
   background: #0a0b0d;
   padding: 15px 30px;
   border-bottom: 1px solid #222;
@@ -19,4 +23,33 @@
 .brand-button:focus-visible {
   outline: 2px solid #e10600;
   outline-offset: 4px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-links button {
+  padding: 8px 12px;
+  color: #d7dbe3;
+  background: transparent;
+  border: 1px solid #303642;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.nav-links button:hover,
+.nav-links button:focus-visible {
+  color: #fff;
+  border-color: #e10600;
+  outline: none;
+}
+
+@media (max-width: 560px) {
+  .navbar {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px 16px;
+  }
 }

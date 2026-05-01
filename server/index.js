@@ -81,6 +81,41 @@ const findNextRace = (sessions = []) => {
   );
 };
 
+const normalizeRaceCalendar = (sessions = []) => {
+  const now = new Date();
+
+  return [...sessions]
+    .filter(
+      (session) =>
+        session.session_name?.toLowerCase() === "race",
+    )
+    .sort((a, b) => new Date(a.date_start) - new Date(b.date_start))
+    .map((session) => {
+      const start = new Date(session.date_start);
+      const end = session.date_end ? new Date(session.date_end) : null;
+      const isLive = start <= now && (!end || end >= now);
+      const isCompleted = end ? end < now : start < now;
+
+      return {
+        sessionKey: session.session_key,
+        meetingKey: session.meeting_key,
+        circuitKey: session.circuit_key,
+        circuitShortName: session.circuit_short_name,
+        countryCode: session.country_code,
+        countryName: session.country_name,
+        location: session.location,
+        sessionName: session.session_name,
+        sessionType: session.session_type,
+        dateStart: session.date_start,
+        dateEnd: session.date_end,
+        gmtOffset: session.gmt_offset,
+        year: session.year,
+        status: isLive ? "live" : isCompleted ? "completed" : "upcoming",
+        isCancelled: Boolean(session.is_cancelled),
+      };
+    });
+};
+
 const findTrackImage = async (race) => {
   if (!race?.circuit_short_name) return null;
 
@@ -149,6 +184,31 @@ app.get("/api/race", async (req, res) => {
       race: null,
       trackImage: null,
       message: "Unable to load race data right now.",
+    });
+  }
+});
+
+app.get("/api/calendar", async (req, res) => {
+  const requestedYear = Number(req.query.year) || new Date().getFullYear();
+
+  try {
+    const response = await openF1.get("/sessions");
+    const sessions = Array.isArray(response.data) ? response.data : [];
+    const yearSessions = sessions.filter(
+      (session) => Number(session.year) === requestedYear,
+    );
+
+    res.json({
+      year: requestedYear,
+      races: normalizeRaceCalendar(yearSessions),
+    });
+  } catch (err) {
+    console.log("Calendar API error:", err.message);
+
+    res.json({
+      year: requestedYear,
+      races: [],
+      message: "Unable to load the race calendar right now.",
     });
   }
 });
