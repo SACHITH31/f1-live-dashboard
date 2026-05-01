@@ -4,9 +4,19 @@
   border-bottom: 1px solid #222;
 }
 
-.navbar h1 {
+.brand-button {
   color: #e10600;
-  cursor: pointer;
+  padding: 0;
+  font: inherit;
   font-size: 22px;
+  font-weight: 700;
   letter-spacing: 1px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.brand-button:focus-visible {
+  outline: 2px solid #e10600;
+  outline-offset: 4px;
 }

@@ -4,84 +4,132 @@ import cors from "cors";
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 
-// 🔥 SWITCH (VERY IMPORTANT)
-const SESSION_KEY = "latest"; // ✅ real-time
-// const SESSION_KEY = "9641" // ✅ DEV MODE (uncomment to test movement)
+const PORT = process.env.PORT || 5000;
+const SESSION_KEY = process.env.OPENF1_SESSION_KEY || "latest";
+const OPENF1_BASE_URL = "https://api.openf1.org/v1";
+const REQUEST_TIMEOUT_MS = 10000;
 
-// =======================
-// 🚀 RACE INFO API
-// =======================
+const openF1 = axios.create({
+  baseURL: OPENF1_BASE_URL,
+  timeout: REQUEST_TIMEOUT_MS,
+});
+
+const latestByDriver = (items = []) =>
+  Object.values(
+    items.reduce((acc, item) => {
+      const driverNumber = item.driver_number;
+      if (!driverNumber) return acc;
+
+      if (
+        !acc[driverNumber] ||
+        new Date(item.date) > new Date(acc[driverNumber].date)
+      ) {
+        acc[driverNumber] = item;
+      }
+
+      return acc;
+    }, {}),
+  );
+
+const normalizeCars = (items = []) =>
+  latestByDriver(items).map((car) => ({
+    driver: car.driver_number,
+    x: car.x ?? null,
+    y: car.y ?? null,
+  }));
+
+const findSessionForLiveData = (sessions = []) => {
+  if (SESSION_KEY !== "latest") {
+    return (
+      sessions.find(
+        (session) => String(session.session_key) === String(SESSION_KEY),
+      ) || null
+    );
+  }
+
+  const now = new Date();
+  const activeSession = sessions.find((session) => {
+    const start = new Date(session.date_start);
+    const end = session.date_end ? new Date(session.date_end) : null;
+    return start <= now && (!end || end >= now);
+  });
+
+  if (activeSession) return activeSession;
+
+  return (
+    [...sessions]
+      .filter((session) => new Date(session.date_start) <= now)
+      .sort((a, b) => new Date(b.date_start) - new Date(a.date_start))[0] ||
+    null
+  );
+};
+
+const findNextRace = (sessions = []) => {
+  const now = new Date();
+
+  return (
+    [...sessions]
+      .filter(
+        (session) =>
+          session.session_name?.toLowerCase().includes("race") &&
+          new Date(session.date_start) > now,
+      )
+      .sort((a, b) => new Date(a.date_start) - new Date(b.date_start))[0] ||
+    null
+  );
+};
+
+const findTrackImage = async (race) => {
+  if (!race?.circuit_short_name) return null;
+
+  const meetingRes = await openF1.get("/meetings");
+  const meeting = meetingRes.data.find(
+    (item) =>
+      item.circuit_short_name?.toLowerCase() ===
+      race.circuit_short_name.toLowerCase(),
+  );
+
+  return meeting?.circuit_image
+    ? decodeURIComponent(meeting.circuit_image)
+    : null;
+};
+
 app.get("/api/race", async (req, res) => {
-  console.log("API HIT 🚀");
-
   try {
-    let isLive = false;
     let cars = [];
-    let nextRace = null;
     let trackImage = null;
 
-    // 🟢 1. CHECK LIVE DATA
     try {
-      const liveRes = await axios.get(
-        `https://api.openf1.org/v1/positions?session_key=${SESSION_KEY}`,
+      const locationRes = await openF1.get(
+        `/location?session_key=${SESSION_KEY}`,
       );
-
-      if (Array.isArray(liveRes.data) && liveRes.data.length > 0) {
-        isLive = true;
-
-        cars = liveRes.data.map((car) => ({
+      cars = normalizeCars(locationRes.data);
+    } catch (err) {
+      try {
+        const positionRes = await openF1.get(
+          `/positions?session_key=${SESSION_KEY}`,
+        );
+        cars = latestByDriver(positionRes.data).map((car) => ({
           driver: car.driver_number,
+          x: null,
+          y: null,
         }));
+      } catch {
+        console.log("Live data not available:", err.message);
       }
-    } catch (err) {
-      console.log("Live data not available");
     }
 
-    // 🟡 2. GET NEXT RACE
+    const scheduleRes = await openF1.get("/sessions");
+    const sessions = Array.isArray(scheduleRes.data) ? scheduleRes.data : [];
+    const isLive = cars.length > 0;
+    const race = isLive
+      ? findSessionForLiveData(sessions) || findNextRace(sessions)
+      : findNextRace(sessions);
+
     try {
-      const scheduleRes = await axios.get("https://api.openf1.org/v1/sessions");
-
-      const now = new Date();
-
-      const raceSessions = scheduleRes.data.filter(
-        (session) =>
-          session.session_name &&
-          session.session_name.toLowerCase().includes("race"),
-      );
-
-      const futureRaces = raceSessions.filter(
-        (session) => new Date(session.date_start) > now,
-      );
-
-      futureRaces.sort(
-        (a, b) => new Date(a.date_start) - new Date(b.date_start),
-      );
-
-      nextRace = futureRaces[0] || null;
-    } catch (err) {
-      console.log("Schedule fetch error:", err.message);
-    }
-
-    // 🔥 3. GET TRACK IMAGE (ROBUST MATCH)
-    try {
-      if (nextRace) {
-        const meetingRes = await axios.get(
-          "https://api.openf1.org/v1/meetings",
-        );
-
-        const meeting = meetingRes.data.find(
-          (m) =>
-            m.circuit_short_name &&
-            nextRace.circuit_short_name &&
-            m.circuit_short_name.toLowerCase() ===
-              nextRace.circuit_short_name.toLowerCase(),
-        );
-
-        trackImage = meeting?.circuit_image
-          ? decodeURIComponent(meeting.circuit_image)
-          : null;
-      }
+      trackImage = await findTrackImage(race);
     } catch (err) {
       console.log("Track image fetch error:", err.message);
     }
@@ -89,78 +137,73 @@ app.get("/api/race", async (req, res) => {
     return res.json({
       isLive,
       cars,
-      race: nextRace,
+      race,
       trackImage,
     });
   } catch (err) {
-    console.log("Server error:", err.message);
+    console.log("Race API error:", err.message);
 
     return res.json({
       isLive: false,
       cars: [],
       race: null,
       trackImage: null,
+      message: "Unable to load race data right now.",
     });
   }
 });
 
-// =======================
-// 🚗 LOCATION API (MOVEMENT)
-// =======================
 app.get("/api/location", async (req, res) => {
   try {
-    const response = await axios.get(
-      `https://api.openf1.org/v1/location?session_key=${SESSION_KEY}`,
+    const response = await openF1.get(
+      `/location?session_key=${SESSION_KEY}`,
     );
 
     if (!Array.isArray(response.data) || response.data.length === 0) {
       return res.json([]);
     }
 
-    const latest = Object.values(
-      response.data.reduce((acc, curr) => {
-        if (
-          !acc[curr.driver_number] ||
-          new Date(curr.date) > new Date(acc[curr.driver_number].date)
-        ) {
-          acc[curr.driver_number] = curr;
-        }
-        return acc;
-      }, {}),
+    res.json(
+      normalizeCars(response.data).filter(
+        (car) => car.x != null && car.y != null,
+      ),
     );
-
-    const cars = latest.map((car) => ({
-      driver: car.driver_number,
-      x: car.x,
-      y: car.y,
-    }));
-
-    res.json(cars);
   } catch (err) {
     console.log("Location API error:", err.message);
     res.json([]);
   }
 });
 
-// =======================
-// 🏎️ DRIVERS API
-// =======================
-app.get("/api/drivers", async (req, res) => {
+app.get("/api/cars", async (req, res) => {
   try {
-    const response = await axios.get(
-      `https://api.openf1.org/v1/drivers?session_key=${SESSION_KEY}`,
+    const response = await openF1.get(
+      `/location?session_key=${SESSION_KEY}`,
     );
 
-    res.json(response.data);
+    res.json(
+      normalizeCars(response.data).filter(
+        (car) => car.x != null && car.y != null,
+      ),
+    );
+  } catch (err) {
+    console.log("Cars API error:", err.message);
+    res.json([]);
+  }
+});
+
+app.get("/api/drivers", async (req, res) => {
+  try {
+    const response = await openF1.get(
+      `/drivers?session_key=${SESSION_KEY}`,
+    );
+
+    res.json(Array.isArray(response.data) ? response.data : []);
   } catch (err) {
     console.log("Drivers API error:", err.message);
     res.json([]);
   }
 });
 
-// =======================
-// 🚀 START SERVER
-// =======================
-app.listen(5000, () => {
-  console.log("Server running on http://localhost:5000 🚀");
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });

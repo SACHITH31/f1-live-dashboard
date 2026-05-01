@@ -2,55 +2,60 @@ import "./Leaderboard.css";
 import teamLogos from "../../services/teamLogos";
 
 function Leaderboard({ cars, drivers, selectedDriver, setSelectedDriver }) {
-
-  // 🧠 Merge car + driver data
   const merged = cars.map((car, index) => {
-    const driverInfo = drivers.find(
-      (d) => d.driver_number === car.driver
-    );
+    const driverInfo = drivers.find((d) => d.driver_number === car.driver);
+    const teamColor = driverInfo?.team_colour
+      ? `#${driverInfo.team_colour}`
+      : "#e10600";
 
     return {
       position: index + 1,
       driver: car.driver,
-      name: driverInfo?.full_name || "Unknown",
-      team: driverInfo?.team_name || "Unknown",
-      color: `#${driverInfo?.team_colour}` || "#e10600",
+      name: driverInfo?.full_name || `Driver ${car.driver}`,
+      team: driverInfo?.team_name || "Unknown team",
+      color: teamColor,
       logo: teamLogos[driverInfo?.team_name] || null,
     };
   });
 
   return (
     <div className="leaderboard">
-      <h2>🏁 Leaderboard</h2>
+      <h2>Leaderboard</h2>
 
-      {merged.map((d) => (
-        <div
-          key={d.driver}
+      {merged.length === 0 && (
+        <p className="empty-leaderboard">Waiting for live car data...</p>
+      )}
+
+      {merged.map((driver) => (
+        <button
+          key={driver.driver}
           className={`driver-row ${
-            selectedDriver === d.driver ? "active" : ""
+            selectedDriver === driver.driver ? "active" : ""
           }`}
-          onClick={() => setSelectedDriver(d.driver)}
+          onClick={() => setSelectedDriver?.(driver.driver)}
+          type="button"
         >
-          {/* POSITION */}
-          <div className="pos">{d.position}</div>
+          <span className="pos">{driver.position}</span>
 
-          {/* COLOR BAR */}
-          <div
+          <span
             className="color-bar"
-            style={{ background: d.color }}
+            style={{ background: driver.color }}
+            aria-hidden="true"
           />
 
-          {/* LOGO */}
-          {d.logo && (
-            <img className="team-logo" src={d.logo} alt="logo" />
+          {driver.logo && (
+            <img
+              className="team-logo"
+              src={driver.logo}
+              alt={`${driver.team} logo`}
+            />
           )}
 
-          {/* DRIVER INFO */}
-          <div className="info">
-            <span className="name">{d.name}</span>
-            <span className="team">{d.team}</span>
-          </div>
-        </div>
+          <span className="info">
+            <span className="name">{driver.name}</span>
+            <span className="team">{driver.team}</span>
+          </span>
+        </button>
       ))}
     </div>
   );

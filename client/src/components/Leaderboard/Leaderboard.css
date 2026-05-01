@@ -1,96 +1,76 @@
 .leaderboard {
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+  background: #111317;
+  color: #fff;
+  border-radius: 8px;
 }
 
 .leaderboard h2 {
   color: #e10600;
-  margin-bottom: 20px;
-}
-
-.driver {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-  border-bottom: 1px solid #222;
-  color: #e0e0e0;
-}
-
-.driver.active {
-  background-color: rgba(225, 6, 0, 0.2);
-  border-left: 3px solid #e10600;
-}
-
-.leaderboard {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.driver {
-  display: flex;
-  align-items: center;
-  background: #16191e;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #222;
-  transition: transform 0.4s ease, background 0.3s;
-}
-
-.driver:hover {
-  background: #1c1f26;
-}
-
-.driver.active {
-  border: 1px solid #e10600;
-  box-shadow: 0 0 10px rgba(225, 6, 0, 0.3);
-}
-
-.leaderboard {
-  padding: 15px;
-  background: #111;
-  color: #fff;
-  border-radius: 10px;
+  margin: 0 0 10px;
 }
 
 .driver-row {
   display: flex;
   align-items: center;
+  width: 100%;
   padding: 10px;
-  margin: 6px 0;
-  background: #1a1a1a;
+  margin: 0;
+  color: inherit;
+  text-align: left;
+  background: #1a1d23;
+  border: 1px solid transparent;
   border-radius: 8px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
-.driver-row:hover {
-  background: #222;
+.driver-row:hover,
+.driver-row:focus-visible {
+  background: #22262e;
+  outline: none;
 }
 
 .driver-row.active {
-  border: 1px solid #fff;
+  border-color: #fff;
 }
 
 .pos {
   width: 30px;
+  flex: 0 0 30px;
   font-weight: bold;
 }
 
 .color-bar {
   width: 4px;
   height: 40px;
+  flex: 0 0 4px;
   margin-right: 10px;
+  border-radius: 2px;
 }
 
 .team-logo {
   width: 30px;
   height: 30px;
+  flex: 0 0 30px;
   margin-right: 10px;
+  object-fit: contain;
 }
 
 .info {
   display: flex;
+  min-width: 0;
   flex-direction: column;
+}
+
+.name,
+.team {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .name {
@@ -98,7 +78,8 @@
   font-weight: bold;
 }
 
-.team {
+.team,
+.empty-leaderboard {
+  color: #a8adb7;
   font-size: 12px;
-  color: #aaa;
 }

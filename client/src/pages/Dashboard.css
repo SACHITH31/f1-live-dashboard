@@ -7,6 +7,7 @@ body {
 .dashboard-container {
   display: flex;
   justify-content: center;
+  padding: 0 16px;
   margin-top: 80px;
 }
 
@@ -66,4 +67,15 @@ body {
   0% { opacity: 0.5 }
   50% { opacity: 1 }
   100% { opacity: 0.5 }
+}
+
+@media (max-width: 520px) {
+  .dashboard-container {
+    margin-top: 40px;
+  }
+
+  .race-card {
+    width: 100%;
+    padding: 24px 18px;
+  }
 }

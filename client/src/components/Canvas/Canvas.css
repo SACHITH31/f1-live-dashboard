@@ -1,0 +1,10 @@
+.track-canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  min-height: 260px;
+  max-height: 620px;
+  border-radius: 8px;
+  background: #0a0b0d;
+  cursor: crosshair;
+}

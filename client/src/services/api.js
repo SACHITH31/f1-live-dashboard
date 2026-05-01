@@ -1,39 +1,26 @@
-export const getCars = async () => {
-  const res = await fetch("http://localhost:5000/api/cars");
-  return res.json();
-};
+const API_BASE_URL =
+  process.env.REACT_APP_API_BASE_URL?.replace(/\/$/, "") ||
+  "http://localhost:5000";
 
-export const getRaceData = async () => {
+const requestJson = async (path, fallback) => {
   try {
-    const res = await fetch("http://localhost:5000/api/race");
+    const res = await fetch(`${API_BASE_URL}${path}`);
 
     if (!res.ok) {
-      throw new Error("API failed");
+      throw new Error(`API request failed with ${res.status}`);
     }
 
-    const data = await res.json();
-    return data;
-  } catch (err) {
-    console.log("Frontend API Error:", err);
-    return null;
-  }
-};
-
-export const getLocations = async () => {
-  try {
-    const res = await fetch("http://localhost:5000/api/location");
-    const data = await res.json();
-    return data;
-  } catch {
-    return [];
-  }
-};
-
-export const getDrivers = async () => {
-  try {
-    const res = await fetch("http://localhost:5000/api/drivers");
     return await res.json();
-  } catch {
-    return [];
+  } catch (err) {
+    console.log(`Frontend API error for ${path}:`, err);
+    return fallback;
   }
 };
+
+export const getCars = async () => requestJson("/api/cars", []);
+
+export const getRaceData = async () => requestJson("/api/race", null);
+
+export const getLocations = async () => requestJson("/api/location", []);
+
+export const getDrivers = async () => requestJson("/api/drivers", []);

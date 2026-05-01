@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar/Navbar";
 import Canvas from "../components/Canvas/Canvas";
 import Leaderboard from "../components/Leaderboard/Leaderboard";
-import { getRaceData, getDrivers } from "../services/api";
+import { getRaceData, getDrivers, getLocations } from "../services/api";
 import "./RacePage.css";
 
 function RacePage() {
@@ -12,68 +12,110 @@ function RacePage() {
   const [cars, setCars] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [selectedDriver, setSelectedDriver] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // 🔥 FETCH RACE DATA + POLLING (FIXED)
   useEffect(() => {
-    let interval = null;
+    let isMounted = true;
 
     const fetchData = async () => {
-      try {
-        const data = await getRaceData();
-        if (!data) return;
+      const data = await getRaceData();
 
-        setRace(data.race);
-        setIsLive(data.isLive);
-        setTrackImage(data.trackImage || null);
+      if (!isMounted) return;
 
-        if (Array.isArray(data.cars)) {
-          setCars(data.cars);
-        }
-
-        // ✅ start polling only once
-        if (data.isLive && !interval) {
-          interval = setInterval(fetchData, 3000);
-        }
-
-      } catch (err) {
-        console.log("Race fetch error:", err);
+      if (!data) {
+        setError("Unable to load race data right now.");
+        setLoading(false);
+        return;
       }
+
+      setError(data.message || "");
+      setRace(data.race);
+      setIsLive(Boolean(data.isLive));
+      setTrackImage(data.trackImage || null);
+
+      if (Array.isArray(data.cars)) {
+        setCars(data.cars);
+      }
+
+      setLoading(false);
     };
 
     fetchData();
+    const interval = setInterval(fetchData, 30000);
 
     return () => {
-      if (interval) clearInterval(interval);
+      isMounted = false;
+      clearInterval(interval);
     };
   }, []);
 
-  // 🔥 FETCH DRIVERS
   useEffect(() => {
+    let isMounted = true;
+
     const fetchDrivers = async () => {
-      try {
-        const data = await getDrivers();
-        if (Array.isArray(data)) {
-          setDrivers(data);
-        }
-      } catch (err) {
-        console.log("Drivers fetch error:", err);
+      const data = await getDrivers();
+
+      if (isMounted && Array.isArray(data)) {
+        setDrivers(data);
       }
     };
 
     fetchDrivers();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
+
+  useEffect(() => {
+    if (!isLive) return;
+
+    let isMounted = true;
+
+    const fetchLocations = async () => {
+      const data = await getLocations();
+
+      if (isMounted && Array.isArray(data) && data.length > 0) {
+        setCars(data);
+      }
+    };
+
+    fetchLocations();
+    const interval = setInterval(fetchLocations, 3000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [isLive]);
 
   const raceDate = race?.date_start
     ? new Date(race.date_start).toLocaleString()
     : "TBD";
 
+  if (loading) {
+    return (
+      <div className="race-page">
+        <Navbar />
+        <div className="race-details">
+          <p className="muted-message">Loading race data...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="race-page">
       <Navbar />
 
-      {isLive ? (
+      {error ? (
+        <div className="race-details">
+          <h2>Race Data Unavailable</h2>
+          <p className="muted-message">{error}</p>
+        </div>
+      ) : isLive ? (
         <div className="race-layout">
-          
           <div className="left">
             <Leaderboard
               cars={cars}
@@ -94,34 +136,32 @@ function RacePage() {
           </div>
 
           <div className="right">
-            <h2>LIVE 🔴</h2>
+            <h2>LIVE NOW</h2>
             <p>
-              {race?.location} - {race?.country_name}
+              {race?.location || "Live session"}{" "}
+              {race?.country_name ? `- ${race.country_name}` : ""}
             </p>
+            <p>{cars.length} cars tracking</p>
           </div>
-
         </div>
       ) : (
         <div className="race-details">
-          
           <h2>UPCOMING RACE</h2>
           <p>
-            {race?.location} - {race?.country_name}
+            {race?.location || "Location TBD"}{" "}
+            {race?.country_name ? `- ${race.country_name}` : ""}
           </p>
           <p>{raceDate}</p>
 
           <div className="track-box">
             <Canvas cars={[]} trackImage={trackImage} />
 
-            <div className="no-live-overlay">
-              No Live Race Data
-            </div>
+            <div className="no-live-overlay">No Live Race Data</div>
           </div>
 
           <div className="drivers-box">
             <p>Drivers will be available during live race</p>
           </div>
-
         </div>
       )}
     </div>

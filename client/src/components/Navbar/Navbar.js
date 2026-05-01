@@ -6,7 +6,9 @@ function Navbar() {
 
   return (
     <div className="navbar">
-      <h1 onClick={() => navigate("/")}>F1 LIVE DASHBOARD</h1>
+      <button className="brand-button" onClick={() => navigate("/")} type="button">
+        F1 LIVE DASHBOARD
+      </button>
     </div>
   )
 }
