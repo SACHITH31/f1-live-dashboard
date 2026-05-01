@@ -1,0 +1,57 @@
+.driver-panel {
+  padding: 15px;
+  color: #f4f6fa;
+  background: #111317;
+  border-radius: 8px;
+}
+
+.driver-panel h2 {
+  margin: 0;
+  color: #fff;
+}
+
+.driver-panel-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.driver-kicker,
+.driver-muted {
+  margin: 0 0 6px;
+  color: #a8adb7;
+  font-size: 13px;
+}
+
+.driver-code {
+  padding: 6px 8px;
+  color: #fff;
+  font-weight: 700;
+  background: #e10600;
+  border-radius: 6px;
+}
+
+.driver-detail-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.driver-detail-grid div {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  background: #1a1d23;
+  border: 1px solid #242832;
+  border-radius: 6px;
+}
+
+.driver-detail-grid span {
+  color: #a8adb7;
+  font-size: 12px;
+}
+
+.driver-detail-grid strong {
+  overflow-wrap: anywhere;
+}

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar/Navbar";
 import { getCalendar } from "../services/api";
 import "./CalendarPage.css";
@@ -8,6 +9,7 @@ const yearOptions = [currentYear - 1, currentYear, currentYear + 1];
 const filters = ["all", "upcoming", "completed"];
 
 function CalendarPage() {
+  const navigate = useNavigate();
   const [year, setYear] = useState(currentYear);
   const [filter, setFilter] = useState("all");
   const [races, setRaces] = useState([]);
@@ -94,7 +96,12 @@ function CalendarPage() {
               const isNext = race.sessionKey === nextRaceKey;
 
               return (
-                <article className="calendar-race" key={race.sessionKey}>
+                <button
+                  className="calendar-race"
+                  key={race.sessionKey}
+                  onClick={() => navigate(`/calendar/${race.sessionKey}`)}
+                  type="button"
+                >
                   <div className="round-number">{index + 1}</div>
 
                   <div className="race-main">
@@ -126,10 +133,10 @@ function CalendarPage() {
                             hour: "2-digit",
                             minute: "2-digit",
                           })
-                        : "Time TBD"}
+                      : "Time TBD"}
                     </span>
                   </div>
-                </article>
+                </button>
               );
             })}
           </div>

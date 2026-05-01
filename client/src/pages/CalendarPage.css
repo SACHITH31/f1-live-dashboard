@@ -82,10 +82,22 @@
   grid-template-columns: 56px minmax(0, 1fr) auto;
   align-items: center;
   gap: 16px;
+  width: 100%;
   padding: 16px;
+  color: inherit;
+  text-align: left;
   background: #16191e;
   border: 1px solid #242832;
   border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.calendar-race:hover,
+.calendar-race:focus-visible {
+  background: #1b1f26;
+  border-color: #e10600;
+  outline: none;
 }
 
 .round-number {

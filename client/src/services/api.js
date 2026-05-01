@@ -24,6 +24,13 @@ export const getRaceData = async () => requestJson("/api/race", null);
 export const getCalendar = async (year = new Date().getFullYear()) =>
   requestJson(`/api/calendar?year=${year}`, { year, races: [] });
 
+export const getRaceDetails = async (sessionKey) =>
+  requestJson(`/api/calendar/${sessionKey}`, {
+    race: null,
+    weekendSessions: [],
+    trackImage: null,
+  });
+
 export const getLocations = async () => requestJson("/api/location", []);
 
 export const getDrivers = async () => requestJson("/api/drivers", []);

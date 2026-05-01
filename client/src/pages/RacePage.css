@@ -68,8 +68,44 @@
   color: #a8adb7;
 }
 
+.mobile-tabs {
+  display: none;
+  gap: 8px;
+  padding: 14px 16px 0;
+}
+
+.mobile-tabs button {
+  flex: 1;
+  padding: 9px 10px;
+  color: #cdd2dc;
+  text-transform: capitalize;
+  background: #16191e;
+  border: 1px solid #303642;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.mobile-tabs button.active {
+  color: #fff;
+  background: #e10600;
+  border-color: #e10600;
+}
+
 @media (max-width: 920px) {
+  .mobile-tabs {
+    display: flex;
+  }
+
   .race-layout {
     grid-template-columns: 1fr;
+    padding: 14px 16px;
+  }
+
+  .race-layout > div {
+    display: none;
+  }
+
+  .race-layout > div.tab-active {
+    display: block;
   }
 }

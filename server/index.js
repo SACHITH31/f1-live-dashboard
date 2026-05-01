@@ -116,6 +116,34 @@ const normalizeRaceCalendar = (sessions = []) => {
     });
 };
 
+const normalizeSession = (session) => {
+  if (!session) return null;
+
+  const now = new Date();
+  const start = new Date(session.date_start);
+  const end = session.date_end ? new Date(session.date_end) : null;
+  const isLive = start <= now && (!end || end >= now);
+  const isCompleted = end ? end < now : start < now;
+
+  return {
+    sessionKey: session.session_key,
+    meetingKey: session.meeting_key,
+    circuitKey: session.circuit_key,
+    circuitShortName: session.circuit_short_name,
+    countryCode: session.country_code,
+    countryName: session.country_name,
+    location: session.location,
+    sessionName: session.session_name,
+    sessionType: session.session_type,
+    dateStart: session.date_start,
+    dateEnd: session.date_end,
+    gmtOffset: session.gmt_offset,
+    year: session.year,
+    status: isLive ? "live" : isCompleted ? "completed" : "upcoming",
+    isCancelled: Boolean(session.is_cancelled),
+  };
+};
+
 const findTrackImage = async (race) => {
   if (!race?.circuit_short_name) return null;
 
@@ -209,6 +237,54 @@ app.get("/api/calendar", async (req, res) => {
       year: requestedYear,
       races: [],
       message: "Unable to load the race calendar right now.",
+    });
+  }
+});
+
+app.get("/api/calendar/:sessionKey", async (req, res) => {
+  const sessionKey = req.params.sessionKey;
+
+  try {
+    const sessionsRes = await openF1.get("/sessions");
+    const sessions = Array.isArray(sessionsRes.data) ? sessionsRes.data : [];
+    const session = sessions.find(
+      (item) => String(item.session_key) === String(sessionKey),
+    );
+
+    if (!session) {
+      return res.json({
+        race: null,
+        weekendSessions: [],
+        trackImage: null,
+        message: "Race details were not found.",
+      });
+    }
+
+    const weekendSessions = sessions
+      .filter((item) => item.meeting_key === session.meeting_key)
+      .sort((a, b) => new Date(a.date_start) - new Date(b.date_start))
+      .map(normalizeSession);
+
+    let trackImage = null;
+    try {
+      trackImage = await findTrackImage(session);
+    } catch (err) {
+      console.log("Race detail track image error:", err.message);
+    }
+
+    return res.json({
+      race: normalizeSession(session),
+      weekendSessions,
+      trackImage,
+    });
+  } catch (err) {
+    console.log("Race detail API error:", err.message);
+
+    return res.json({
+      race: null,
+      weekendSessions: [],
+      trackImage: null,
+      message: "Unable to load race details right now.",
     });
   }
 });
