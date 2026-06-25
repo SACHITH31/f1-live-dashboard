@@ -1,8 +1,19 @@
 import "./DriverPanel.css";
 
-function DriverPanel({ selectedDriver, drivers = [], cars = [], isLive, race }) {
+function DriverPanel({
+  selectedDriver,
+  drivers = [],
+  cars = [],
+  isLive,
+  race,
+  isFavoriteDriver,
+  isFavoriteTeam,
+  toggleFavoriteDriver,
+  toggleFavoriteTeam,
+}) {
   const driverInfo = drivers.find((driver) => driver.driver_number === selectedDriver);
   const car = cars.find((item) => item.driver === selectedDriver);
+  const teamName = driverInfo?.team_name || "Unknown";
 
   if (!selectedDriver) {
     return (
@@ -25,10 +36,21 @@ function DriverPanel({ selectedDriver, drivers = [], cars = [], isLive, race }) 
         )}
       </div>
 
+      <div className="favorite-actions">
+        <button onClick={() => toggleFavoriteDriver?.(selectedDriver)} type="button">
+          {isFavoriteDriver?.(selectedDriver) ? "Favorited driver" : "Favorite driver"}
+        </button>
+        {driverInfo?.team_name && (
+          <button onClick={() => toggleFavoriteTeam?.(teamName)} type="button">
+            {isFavoriteTeam?.(teamName) ? "Favorited team" : "Favorite team"}
+          </button>
+        )}
+      </div>
+
       <div className="driver-detail-grid">
         <div>
           <span>Team</span>
-          <strong>{driverInfo?.team_name || "Unknown"}</strong>
+          <strong>{teamName}</strong>
         </div>
         <div>
           <span>Country</span>

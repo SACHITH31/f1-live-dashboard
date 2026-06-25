@@ -10,6 +10,7 @@ function CalendarRacePage() {
   const [race, setRace] = useState(null);
   const [weekendSessions, setWeekendSessions] = useState([]);
   const [trackImage, setTrackImage] = useState(null);
+  const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
 
@@ -25,6 +26,7 @@ function CalendarRacePage() {
       setRace(data?.race || null);
       setWeekendSessions(Array.isArray(data?.weekendSessions) ? data.weekendSessions : []);
       setTrackImage(data?.trackImage || null);
+      setDetails(data?.details || null);
       setMessage(data?.message || "");
       setLoading(false);
     };
@@ -123,6 +125,131 @@ function CalendarRacePage() {
                     );
                   })}
                 </div>
+              </div>
+            </section>
+
+            <section className="race-data-grid">
+              <div className="race-data-panel classification-panel">
+                <h2>Final Classification</h2>
+                {details?.finalClassification?.length > 0 ? (
+                  <div className="classification-list">
+                    {details.finalClassification.map((driver) => (
+                      <div className="classification-row" key={driver.driverNumber}>
+                        <span>{driver.position}</span>
+                        <strong>{driver.nameAcronym}</strong>
+                        <p>{driver.fullName}</p>
+                        <em>
+                          {driver.teamName}
+                          {driver.source === "lap-summary" ? " · lap order" : ""}
+                        </em>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="panel-empty">Classification data unavailable.</p>
+                )}
+              </div>
+
+              <div className="race-data-panel">
+                <h2>Fastest Laps</h2>
+                {details?.fastestLaps?.length > 0 ? (
+                  <div className="compact-list">
+                    {details.fastestLaps.map((lap) => (
+                      <div className="compact-row" key={lap.driverNumber}>
+                        <div>
+                          <strong>{lap.fullName}</strong>
+                          <span>{lap.teamName}</span>
+                        </div>
+                        <em>{lap.bestLapText || "TBD"}</em>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="panel-empty">Lap data unavailable.</p>
+                )}
+              </div>
+
+              <div className="race-data-panel">
+                <h2>Pit Stops</h2>
+                {details?.pitSummary?.length > 0 ? (
+                  <div className="compact-list">
+                    {details.pitSummary.map((pit) => (
+                      <div className="compact-row" key={pit.driverNumber}>
+                        <div>
+                          <strong>{pit.fullName}</strong>
+                          <span>{pit.teamName}</span>
+                        </div>
+                        <em>
+                          {pit.stops} stop{pit.stops === 1 ? "" : "s"} | {pit.totalDurationText}
+                        </em>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="panel-empty">Pit stop data unavailable.</p>
+                )}
+              </div>
+
+              <div className="race-data-panel">
+                <h2>Tyre Compounds</h2>
+                {details?.stintSummary?.length > 0 ? (
+                  <div className="compact-list">
+                    {details.stintSummary.map((stint) => (
+                      <div className="compact-row" key={stint.driverNumber}>
+                        <div>
+                          <strong>{stint.fullName}</strong>
+                          <span>{stint.teamName}</span>
+                        </div>
+                        <em>{stint.compounds.join(", ") || "TBD"}</em>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="panel-empty">Tyre data unavailable.</p>
+                )}
+              </div>
+
+              <div className="race-data-panel">
+                <h2>Weather</h2>
+                {details?.weatherSummary ? (
+                  <div className="weather-grid">
+                    <div>
+                      <span>Air</span>
+                      <strong>{details.weatherSummary.airTemperature ?? "TBD"} C</strong>
+                    </div>
+                    <div>
+                      <span>Track</span>
+                      <strong>{details.weatherSummary.trackTemperature ?? "TBD"} C</strong>
+                    </div>
+                    <div>
+                      <span>Humidity</span>
+                      <strong>{details.weatherSummary.humidity ?? "TBD"}%</strong>
+                    </div>
+                    <div>
+                      <span>Rainfall</span>
+                      <strong>{details.weatherSummary.rainfall ?? "TBD"}</strong>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="panel-empty">Weather data unavailable.</p>
+                )}
+              </div>
+
+              <div className="race-data-panel race-control-panel">
+                <h2>Race Control</h2>
+                {details?.raceControlMessages?.length > 0 ? (
+                  <div className="message-list">
+                    {details.raceControlMessages.map((item, index) => (
+                      <div className="message-row" key={`${item.date}-${index}`}>
+                        <strong>{item.category || item.flag || "Message"}</strong>
+                        <p>{item.message}</p>
+                        <span>{item.lapNumber ? `Lap ${item.lapNumber}` : "Session"}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="panel-empty">Race control messages unavailable.</p>
+                )}
               </div>
             </section>
           </>

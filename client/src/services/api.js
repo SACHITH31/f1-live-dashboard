@@ -29,6 +29,7 @@ export const getRaceDetails = async (sessionKey) =>
     race: null,
     weekendSessions: [],
     trackImage: null,
+    details: null,
   });
 
 export const getLocations = async () => requestJson("/api/location", []);

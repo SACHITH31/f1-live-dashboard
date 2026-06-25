@@ -4,6 +4,7 @@ import Canvas from "../components/Canvas/Canvas";
 import Leaderboard from "../components/Leaderboard/Leaderboard";
 import DriverPanel from "../components/DriverPanel/DriverPanel";
 import { getRaceData, getDrivers, getLocations } from "../services/api";
+import useFavorites from "../hooks/useFavorites";
 import "./RacePage.css";
 
 const tabs = ["track", "leaderboard", "details"];
@@ -18,6 +19,12 @@ function RacePage() {
   const [activeTab, setActiveTab] = useState("track");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const {
+    isFavoriteDriver,
+    isFavoriteTeam,
+    toggleDriver,
+    toggleTeam,
+  } = useFavorites();
 
   useEffect(() => {
     let isMounted = true;
@@ -140,6 +147,9 @@ function RacePage() {
               drivers={drivers}
               selectedDriver={selectedDriver}
               setSelectedDriver={setSelectedDriver}
+              isFavoriteDriver={isFavoriteDriver}
+              isFavoriteTeam={isFavoriteTeam}
+              toggleFavoriteDriver={toggleDriver}
             />
           </div>
 
@@ -166,6 +176,10 @@ function RacePage() {
               cars={cars}
               isLive={isLive}
               race={race}
+              isFavoriteDriver={isFavoriteDriver}
+              isFavoriteTeam={isFavoriteTeam}
+              toggleFavoriteDriver={toggleDriver}
+              toggleFavoriteTeam={toggleTeam}
             />
           </div>
           </div>
@@ -192,6 +206,10 @@ function RacePage() {
               cars={cars}
               isLive={isLive}
               race={race}
+              isFavoriteDriver={isFavoriteDriver}
+              isFavoriteTeam={isFavoriteTeam}
+              toggleFavoriteDriver={toggleDriver}
+              toggleFavoriteTeam={toggleTeam}
             />
           </div>
         </div>

@@ -38,6 +38,10 @@
   border-color: #fff;
 }
 
+.driver-row.favorite {
+  border-color: rgba(225, 6, 0, 0.7);
+}
+
 .pos {
   width: 30px;
   flex: 0 0 30px;
@@ -82,4 +86,11 @@
 .empty-leaderboard {
   color: #a8adb7;
   font-size: 12px;
+}
+
+.favorite-toggle {
+  margin-left: auto;
+  color: #f7c948;
+  font-size: 20px;
+  line-height: 1;
 }

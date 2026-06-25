@@ -68,10 +68,12 @@
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
   gap: 18px;
+  margin-bottom: 18px;
 }
 
 .track-map-panel,
 .weekend-panel,
+.race-data-panel,
 .race-detail-message {
   background: #16191e;
   border: 1px solid #242832;
@@ -136,9 +138,122 @@
   text-align: center;
 }
 
+.race-data-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.race-data-panel {
+  min-width: 0;
+  padding: 16px;
+}
+
+.race-data-panel h2 {
+  margin: 0 0 14px;
+  color: #e10600;
+}
+
+.classification-panel,
+.race-control-panel {
+  grid-column: 1 / -1;
+}
+
+.classification-list,
+.compact-list,
+.message-list {
+  display: grid;
+  gap: 8px;
+}
+
+.classification-row,
+.compact-row,
+.message-row,
+.weather-grid div {
+  background: #1a1d23;
+  border: 1px solid #242832;
+  border-radius: 6px;
+}
+
+.classification-row {
+  display: grid;
+  grid-template-columns: 42px 70px minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+}
+
+.classification-row p,
+.classification-row em,
+.compact-row span,
+.compact-row em,
+.message-row p,
+.message-row span,
+.panel-empty,
+.weather-grid span {
+  color: #a8adb7;
+}
+
+.classification-row p,
+.classification-row em {
+  overflow: hidden;
+  margin: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.classification-row em,
+.compact-row em {
+  font-style: normal;
+}
+
+.compact-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px;
+}
+
+.compact-row div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.compact-row strong,
+.compact-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weather-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.weather-grid div {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+}
+
+.message-row {
+  display: grid;
+  gap: 5px;
+  padding: 10px;
+}
+
+.message-row p {
+  margin: 0;
+}
+
 @media (max-width: 820px) {
   .race-detail-header,
-  .race-detail-grid {
+  .race-detail-grid,
+  .race-data-grid {
     grid-template-columns: 1fr;
   }
 
@@ -150,5 +265,14 @@
   .race-detail-date {
     min-width: 0;
     text-align: left;
+  }
+
+  .classification-row {
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+
+  .classification-row p,
+  .classification-row em {
+    grid-column: 2;
   }
 }
