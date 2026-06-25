@@ -274,38 +274,6 @@
   font-style: normal;
 }
 
-.results-table-wrap {
-  overflow-x: auto;
-}
-
-.results-table {
-  width: 100%;
-  min-width: 820px;
-  border-collapse: collapse;
-}
-
-.results-table th,
-.results-table td {
-  padding: 10px;
-  text-align: left;
-  border-bottom: 1px solid #242832;
-}
-
-.results-table th {
-  color: #a8adb7;
-  font-size: 12px;
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-
-.results-table td {
-  color: #d7dbe3;
-}
-
-.results-table tbody tr:hover {
-  background: #1a1d23;
-}
-
 .classification-row {
   display: grid;
   grid-template-columns: 42px 70px minmax(0, 1fr) minmax(0, 1fr);

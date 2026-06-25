@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/Navbar/Navbar";
+import RaceResultsTable from "../components/RaceResultsTable/RaceResultsTable";
 import { getRaceDetails } from "../services/api";
 import "./CalendarRacePage.css";
 
@@ -98,55 +99,6 @@ function RaceOverviewSection({ overview }) {
             <em>{displayValue(item?.team?.name)}</em>
           </div>
         ))}
-      </div>
-    </section>
-  );
-}
-
-function RaceClassificationTable({ rows }) {
-  if (!Array.isArray(rows) || rows.length === 0) {
-    return (
-      <section className="race-data-panel classification-panel">
-        <h2>Race Classification</h2>
-        <p className="panel-empty">Verified classification data unavailable.</p>
-      </section>
-    );
-  }
-
-  return (
-    <section className="race-data-panel classification-panel">
-      <h2>Race Classification</h2>
-      <div className="results-table-wrap">
-        <table className="results-table">
-          <thead>
-            <tr>
-              <th>Pos</th>
-              <th>Driver</th>
-              <th>Team</th>
-              <th>Grid</th>
-              <th>Finish</th>
-              <th>Pts</th>
-              <th>Status</th>
-              <th>Gap</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={`${row.finishPosition}-${row.driver?.driverId}`}>
-                <td>{displayValue(row.position)}</td>
-                <td>
-                  <strong>{displayValue(row.driverName)}</strong>
-                </td>
-                <td>{displayValue(row.teamName)}</td>
-                <td>{displayValue(row.gridPosition)}</td>
-                <td>{displayValue(row.finishPosition)}</td>
-                <td>{displayValue(row.points)}</td>
-                <td>{displayValue(row.status)}</td>
-                <td>{displayValue(row.gapToLeader)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
     </section>
   );
@@ -280,7 +232,7 @@ function CalendarRacePage() {
               {race?.status === "completed" && (
                 <>
                   <RaceOverviewSection overview={details?.raceOverview} />
-                  <RaceClassificationTable rows={details?.raceClassification} />
+                  <RaceResultsTable rows={details?.raceClassification} />
                 </>
               )}
 
