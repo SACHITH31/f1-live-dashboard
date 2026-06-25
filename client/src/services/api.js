@@ -35,3 +35,10 @@ export const getRaceDetails = async (sessionKey) =>
 export const getLocations = async () => requestJson("/api/location", []);
 
 export const getDrivers = async () => requestJson("/api/drivers", []);
+
+export const getDriverStandings = async (year = "current") =>
+  requestJson(`/api/standings/drivers?year=${year}`, {
+    year,
+    round: null,
+    standings: [],
+  });

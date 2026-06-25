@@ -3,6 +3,7 @@ import cors from "cors";
 import { PORT } from "./config.js";
 import raceRoutes from "./routes/races.js";
 import driverRoutes from "./routes/drivers.js";
+import standingsRoutes from "./routes/standings.js";
 import { errorHandler, notFoundHandler } from "./utils/errorHandler.js";
 
 const app = express();
@@ -12,6 +13,7 @@ app.use(express.json());
 
 app.use("/api", raceRoutes);
 app.use("/api", driverRoutes);
+app.use("/api", standingsRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

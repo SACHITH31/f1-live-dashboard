@@ -3,6 +3,7 @@ import Dashboard from "./pages/Dashboard";
 import RacePage from "./pages/RacePage";
 import CalendarPage from "./pages/CalendarPage";
 import CalendarRacePage from "./pages/CalendarRacePage";
+import DriverStandingsPage from "./pages/DriverStandingsPage";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/race" element={<RacePage />} />
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/calendar/:sessionKey" element={<CalendarRacePage />} />
+        <Route path="/standings/drivers" element={<DriverStandingsPage />} />
       </Routes>
     </Router>
   );

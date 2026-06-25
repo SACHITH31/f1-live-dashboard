@@ -17,6 +17,9 @@ function Navbar() {
         <button onClick={() => navigate("/calendar")} type="button">
           Calendar
         </button>
+        <button onClick={() => navigate("/standings/drivers")} type="button">
+          Standings
+        </button>
       </nav>
     </div>
   )

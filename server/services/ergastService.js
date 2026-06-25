@@ -34,3 +34,29 @@ export const getQualifyingResults = async (year, round) =>
       Array.isArray(race?.QualifyingResults) &&
       race.QualifyingResults.length > 0,
   );
+
+export const getDriverStandings = async (year = "current") =>
+  getOrSetCache(
+    `ergast:driver-standings:${year}`,
+    async () => {
+      const response = await ergast.get(`/${year}/driverStandings.json`);
+      const standingsLists = response.data?.MRData?.StandingsTable?.StandingsLists;
+      return Array.isArray(standingsLists) && standingsLists.length > 0
+        ? standingsLists[0]
+        : null;
+    },
+    (standings) =>
+      Array.isArray(standings?.DriverStandings) &&
+      standings.DriverStandings.length > 0,
+  );
+
+export const getSeasonResults = async (year = "current") =>
+  getOrSetCache(
+    `ergast:season-results:${year}`,
+    async () => {
+      const response = await ergast.get(`/${year}/results.json?limit=2000`);
+      const races = response.data?.MRData?.RaceTable?.Races;
+      return Array.isArray(races) ? races : [];
+    },
+    (races) => Array.isArray(races) && races.length > 0,
+  );
