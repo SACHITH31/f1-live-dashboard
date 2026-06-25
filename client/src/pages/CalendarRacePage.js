@@ -4,6 +4,154 @@ import Navbar from "../components/Navbar/Navbar";
 import { getRaceDetails } from "../services/api";
 import "./CalendarRacePage.css";
 
+const displayValue = (value) => value ?? "TBD";
+
+function RaceDetailSkeleton() {
+  return (
+    <div className="race-skeleton" aria-label="Loading race details">
+      <div className="skeleton-line wide" />
+      <div className="skeleton-grid">
+        <div className="skeleton-card" />
+        <div className="skeleton-card" />
+      </div>
+      <div className="skeleton-card tall" />
+    </div>
+  );
+}
+
+function RaceOverviewSection({ overview }) {
+  if (!overview) {
+    return (
+      <section className="race-data-panel completed-overview-panel">
+        <h2>Race Overview</h2>
+        <p className="panel-empty">Completed race overview unavailable.</p>
+      </section>
+    );
+  }
+
+  const podium = Array.isArray(overview.podium) ? overview.podium : [];
+  const fastestLap = [
+    overview.fastestLapDriver?.fullName,
+    overview.fastestLapTime,
+  ]
+    .filter(Boolean)
+    .join(" - ");
+
+  return (
+    <section className="race-data-panel completed-overview-panel">
+      <div className="panel-heading-row">
+        <div>
+          <p className="section-label">Completed race</p>
+          <h2>{overview.grandPrixName || "Race Overview"}</h2>
+        </div>
+        <span>{displayValue(overview.country)}</span>
+      </div>
+
+      <div className="overview-grid">
+        <div>
+          <span>Circuit</span>
+          <strong>{displayValue(overview.officialCircuitName)}</strong>
+        </div>
+        <div>
+          <span>Race Date</span>
+          <strong>
+            {overview.raceDate
+              ? new Date(overview.raceDate).toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })
+              : "TBD"}
+          </strong>
+        </div>
+        <div>
+          <span>Winner</span>
+          <strong>{displayValue(overview.winner?.fullName)}</strong>
+        </div>
+        <div>
+          <span>Pole Position</span>
+          <strong>{displayValue(overview.polePosition?.fullName)}</strong>
+        </div>
+        <div>
+          <span>Fastest Lap</span>
+          <strong>{fastestLap || "TBD"}</strong>
+        </div>
+        <div>
+          <span>Total Laps</span>
+          <strong>{displayValue(overview.totalLaps)}</strong>
+        </div>
+        <div>
+          <span>Race Distance</span>
+          <strong>{displayValue(overview.raceDistance)}</strong>
+        </div>
+        <div>
+          <span>Race Duration</span>
+          <strong>{displayValue(overview.raceDuration)}</strong>
+        </div>
+      </div>
+
+      <div className="podium-strip">
+        {podium.map((item, index) => (
+          <div className="podium-card" key={item?.position || index}>
+            <span>P{item?.position || index + 1}</span>
+            <strong>{displayValue(item?.driver?.fullName)}</strong>
+            <em>{displayValue(item?.team?.name)}</em>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function RaceClassificationTable({ rows }) {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return (
+      <section className="race-data-panel classification-panel">
+        <h2>Race Classification</h2>
+        <p className="panel-empty">Verified classification data unavailable.</p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="race-data-panel classification-panel">
+      <h2>Race Classification</h2>
+      <div className="results-table-wrap">
+        <table className="results-table">
+          <thead>
+            <tr>
+              <th>Pos</th>
+              <th>Driver</th>
+              <th>Team</th>
+              <th>Grid</th>
+              <th>Finish</th>
+              <th>Pts</th>
+              <th>Status</th>
+              <th>Gap</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={`${row.finishPosition}-${row.driver?.driverId}`}>
+                <td>{displayValue(row.position)}</td>
+                <td>
+                  <strong>{displayValue(row.driverName)}</strong>
+                </td>
+                <td>{displayValue(row.teamName)}</td>
+                <td>{displayValue(row.gridPosition)}</td>
+                <td>{displayValue(row.finishPosition)}</td>
+                <td>{displayValue(row.points)}</td>
+                <td>{displayValue(row.status)}</td>
+                <td>{displayValue(row.gapToLeader)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
 function CalendarRacePage() {
   const { sessionKey } = useParams();
   const navigate = useNavigate();
@@ -50,7 +198,7 @@ function CalendarRacePage() {
         </button>
 
         {loading ? (
-          <p className="race-detail-message">Loading race details...</p>
+          <RaceDetailSkeleton />
         ) : message ? (
           <p className="race-detail-message">{message}</p>
         ) : (
@@ -129,6 +277,13 @@ function CalendarRacePage() {
             </section>
 
             <section className="race-data-grid">
+              {race?.status === "completed" && (
+                <>
+                  <RaceOverviewSection overview={details?.raceOverview} />
+                  <RaceClassificationTable rows={details?.raceClassification} />
+                </>
+              )}
+
               <div className="race-data-panel classification-panel">
                 <h2>Final Classification</h2>
                 {details?.finalClassification?.length > 0 ? (
@@ -140,7 +295,7 @@ function CalendarRacePage() {
                         <p>{driver.fullName}</p>
                         <em>
                           {driver.teamName}
-                          {driver.source === "lap-summary" ? " · lap order" : ""}
+                          {driver.source === "lap-summary" ? " - lap order" : ""}
                         </em>
                       </div>
                     ))}

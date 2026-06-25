@@ -1,0 +1,36 @@
+import axios from "axios";
+import { ERGAST_BASE_URL, REQUEST_TIMEOUT_MS } from "../config.js";
+import { getOrSetCache } from "../utils/cache.js";
+
+const ergast = axios.create({
+  baseURL: ERGAST_BASE_URL,
+  timeout: REQUEST_TIMEOUT_MS,
+});
+
+const getRaceTable = (data, tableName) => {
+  const races = data?.MRData?.RaceTable?.Races;
+  if (!Array.isArray(races) || races.length === 0) return null;
+  return races[0]?.[tableName] ? races[0] : races[0];
+};
+
+export const getRaceResults = async (year, round) =>
+  getOrSetCache(
+    `ergast:results:${year}:${round}`,
+    async () => {
+      const response = await ergast.get(`/${year}/${round}/results.json`);
+      return getRaceTable(response.data, "Results");
+    },
+    (race) => Array.isArray(race?.Results) && race.Results.length > 0,
+  );
+
+export const getQualifyingResults = async (year, round) =>
+  getOrSetCache(
+    `ergast:qualifying:${year}:${round}`,
+    async () => {
+      const response = await ergast.get(`/${year}/${round}/qualifying.json`);
+      return getRaceTable(response.data, "QualifyingResults");
+    },
+    (race) =>
+      Array.isArray(race?.QualifyingResults) &&
+      race.QualifyingResults.length > 0,
+  );

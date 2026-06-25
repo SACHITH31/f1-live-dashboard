@@ -4,10 +4,15 @@ import {
   safeOpenF1Get,
   safeOpenF1GetAny,
 } from "./openF1Service.js";
+import { getQualifyingResults, getRaceResults } from "./ergastService.js";
 import {
   buildRaceSummary,
   normalizeSession,
 } from "../utils/normalizers.js";
+import {
+  deriveRaceRound,
+  normalizeCompletedRaceData,
+} from "../utils/raceResults.js";
 
 export const findTrackImage = async (race) => {
   if (!race?.circuit_short_name) return null;
@@ -63,18 +68,52 @@ export const getRaceDetailPayload = async (sessionKey) => {
       safeOpenF1Get(`/race_control?session_key=${sessionKey}`),
     ]);
 
+  let completedRaceData = {
+    raceOverview: null,
+    raceClassification: [],
+    dataQuality: null,
+  };
+  const normalizedSession = normalizeSession(session);
+
+  if (normalizedSession?.status === "completed") {
+    const raceRound = deriveRaceRound(sessions, session);
+
+    if (raceRound) {
+      try {
+        const [raceResult, qualifyingResult] = await Promise.all([
+          getRaceResults(raceRound.year, raceRound.round),
+          getQualifyingResults(raceRound.year, raceRound.round).catch((err) => {
+            console.log("Qualifying result fetch error:", err.message);
+            return null;
+          }),
+        ]);
+
+        completedRaceData = normalizeCompletedRaceData({
+          raceResult,
+          qualifyingResult,
+          session,
+        });
+      } catch (err) {
+        console.log("Completed race result fetch error:", err.message);
+      }
+    }
+  }
+
   return {
-    race: normalizeSession(session),
+    race: normalizedSession,
     weekendSessions,
     trackImage,
-    details: buildRaceSummary({
-      drivers,
-      positions,
-      laps,
-      pits,
-      stints,
-      weather,
-      raceControl,
-    }),
+    details: {
+      ...buildRaceSummary({
+        drivers,
+        positions,
+        laps,
+        pits,
+        stints,
+        weather,
+        raceControl,
+      }),
+      ...completedRaceData,
+    },
   };
 };
