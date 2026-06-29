@@ -65,3 +65,28 @@ export const normalizeDriverStandings = (standingsList, seasonResults = []) => {
     };
   });
 };
+
+export const normalizeConstructorStandings = (standingsList) => {
+  const standings = Array.isArray(standingsList?.ConstructorStandings)
+    ? standingsList.ConstructorStandings
+    : [];
+  const leaderPoints = toNumberOrNull(standings[0]?.points);
+
+  return standings.map((standing) => {
+    const constructor = normalizeConstructor(standing.Constructor);
+    const points = toNumberOrNull(standing.points);
+    const gapToLeader =
+      leaderPoints !== null && points !== null ? leaderPoints - points : null;
+
+    return {
+      position: toNumberOrNull(standing.position),
+      rank: toNumberOrNull(standing.position),
+      teamId: constructor.constructorId,
+      teamName: constructor.name,
+      team: constructor,
+      points,
+      wins: toNumberOrNull(standing.wins),
+      gapToLeader,
+    };
+  });
+};

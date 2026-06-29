@@ -18,7 +18,10 @@ function Navbar() {
           Calendar
         </button>
         <button onClick={() => navigate("/standings/drivers")} type="button">
-          Standings
+          Drivers
+        </button>
+        <button onClick={() => navigate("/standings/constructors")} type="button">
+          Constructors
         </button>
       </nav>
     </div>

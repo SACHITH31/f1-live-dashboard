@@ -1,0 +1,228 @@
+.constructor-standings-panel {
+  min-width: 0;
+  padding: 16px;
+  background: #16191e;
+  border: 1px solid #242832;
+  border-radius: 8px;
+}
+
+.constructor-standings-panel h2 {
+  margin: 0 0 14px;
+  color: #e10600;
+}
+
+.constructor-standings-toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.constructor-standings-search {
+  display: grid;
+  width: min(360px, 100%);
+  gap: 6px;
+}
+
+.constructor-standings-search span,
+.constructor-standings-summary,
+.constructor-standings-empty,
+.constructor-standings-table th,
+.constructor-standing-card-head span,
+.constructor-standing-card-grid span {
+  color: #a8adb7;
+}
+
+.constructor-standings-search input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  color: #f4f6fa;
+  background: #1a1d23;
+  border: 1px solid #303642;
+  border-radius: 6px;
+}
+
+.constructor-standings-search input:focus {
+  border-color: #e10600;
+  outline: none;
+}
+
+.constructor-standings-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.constructor-standings-filters button {
+  padding: 9px 11px;
+  color: #d7dbe3;
+  background: #1a1d23;
+  border: 1px solid #303642;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.constructor-standings-filters button.active,
+.constructor-standings-filters button:hover,
+.constructor-standings-filters button:focus-visible {
+  color: #fff;
+  background: #e10600;
+  border-color: #e10600;
+  outline: none;
+}
+
+.constructor-standings-summary {
+  margin-bottom: 14px;
+}
+
+.constructor-standings-empty {
+  padding: 18px;
+  margin: 0;
+  text-align: center;
+  background: #1a1d23;
+  border: 1px solid #242832;
+  border-radius: 6px;
+}
+
+.constructor-standings-table-wrap {
+  max-height: 620px;
+  overflow: auto;
+}
+
+.constructor-standings-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.constructor-standings-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #16191e;
+}
+
+.constructor-standings-table th,
+.constructor-standings-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #242832;
+}
+
+.constructor-standings-table th {
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.constructor-standings-table th button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-transform: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.constructor-standings-table th button:focus-visible {
+  color: #fff;
+  outline: 2px solid #e10600;
+  outline-offset: 4px;
+}
+
+.constructor-standings-table th span {
+  color: #e10600;
+  font-size: 10px;
+  text-transform: none;
+}
+
+.constructor-standings-table td {
+  color: #d7dbe3;
+}
+
+.constructor-standings-table tbody tr:hover {
+  background: #1a1d23;
+}
+
+.constructor-logo,
+.constructor-logo-fallback {
+  display: block;
+  width: 44px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.constructor-logo-fallback {
+  background: #303642;
+  border-radius: 6px;
+}
+
+.constructor-standings-cards {
+  display: none;
+}
+
+.constructor-standing-card {
+  padding: 12px;
+  background: #1a1d23;
+  border: 1px solid #242832;
+  border-radius: 8px;
+}
+
+.constructor-standing-card-head {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.constructor-standing-card-head div,
+.constructor-standing-card-grid {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.constructor-standing-card-head strong,
+.constructor-standing-card-grid strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.constructor-standing-card-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  row-gap: 8px;
+}
+
+@media (max-width: 900px) {
+  .constructor-standings-table {
+    min-width: 680px;
+  }
+}
+
+@media (max-width: 760px) {
+  .constructor-standings-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .constructor-standings-filters {
+    justify-content: flex-start;
+  }
+
+  .constructor-standings-table-wrap {
+    display: none;
+  }
+
+  .constructor-standings-cards {
+    display: grid;
+    gap: 10px;
+  }
+}

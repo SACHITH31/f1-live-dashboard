@@ -42,3 +42,11 @@ export const getDriverStandings = async (year = "current") =>
     round: null,
     standings: [],
   });
+
+export const getConstructorStandings = async (year = "current") =>
+  requestJson(`/api/standings/constructors?year=${year}`, {
+    season: year,
+    year,
+    round: null,
+    standings: [],
+  });

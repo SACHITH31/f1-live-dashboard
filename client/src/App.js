@@ -4,6 +4,7 @@ import RacePage from "./pages/RacePage";
 import CalendarPage from "./pages/CalendarPage";
 import CalendarRacePage from "./pages/CalendarRacePage";
 import DriverStandingsPage from "./pages/DriverStandingsPage";
+import ConstructorStandingsPage from "./pages/ConstructorStandingsPage";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/calendar/:sessionKey" element={<CalendarRacePage />} />
         <Route path="/standings/drivers" element={<DriverStandingsPage />} />
+        <Route path="/standings/constructors" element={<ConstructorStandingsPage />} />
       </Routes>
     </Router>
   );

@@ -1,0 +1,92 @@
+.constructor-standings-page {
+  min-height: 100vh;
+  color: #f4f6fa;
+  background: #0a0b0d;
+}
+
+.constructor-standings-shell {
+  width: min(1080px, calc(100% - 32px));
+  margin: 28px auto 0;
+  padding-bottom: 32px;
+}
+
+.constructor-standings-header {
+  margin-bottom: 18px;
+}
+
+.constructor-standings-header h1 {
+  margin: 0;
+  color: #fff;
+  font-size: 34px;
+}
+
+.constructor-standings-header p {
+  margin: 8px 0 0;
+  color: #a8adb7;
+}
+
+.constructor-standings-message,
+.constructor-standings-skeleton-card,
+.constructor-standings-skeleton-line {
+  background: #16191e;
+  border: 1px solid #242832;
+  border-radius: 8px;
+}
+
+.constructor-standings-message {
+  padding: 28px;
+  color: #a8adb7;
+  text-align: center;
+}
+
+.constructor-standings-skeleton {
+  display: grid;
+  gap: 18px;
+}
+
+.constructor-standings-skeleton-card,
+.constructor-standings-skeleton-line {
+  background: linear-gradient(90deg, #151820 0%, #202530 48%, #151820 100%);
+  background-size: 200% 100%;
+  animation: constructor-standings-skeleton-pulse 1.2s ease-in-out infinite;
+}
+
+.constructor-standings-skeleton-line {
+  width: min(520px, 100%);
+  height: 74px;
+}
+
+.constructor-standings-skeleton-card {
+  min-height: 500px;
+}
+
+.constructor-standings-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #303642;
+  border-top-color: #e10600;
+  border-radius: 50%;
+  animation: constructor-standings-spin 0.8s linear infinite;
+}
+
+@keyframes constructor-standings-skeleton-pulse {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@keyframes constructor-standings-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 680px) {
+  .constructor-standings-header h1 {
+    font-size: 28px;
+  }
+}

@@ -50,6 +50,21 @@ export const getDriverStandings = async (year = "current") =>
       standings.DriverStandings.length > 0,
   );
 
+export const getConstructorStandings = async (year = "current") =>
+  getOrSetCache(
+    `ergast:constructor-standings:${year}`,
+    async () => {
+      const response = await ergast.get(`/${year}/constructorStandings.json`);
+      const standingsLists = response.data?.MRData?.StandingsTable?.StandingsLists;
+      return Array.isArray(standingsLists) && standingsLists.length > 0
+        ? standingsLists[0]
+        : null;
+    },
+    (standings) =>
+      Array.isArray(standings?.ConstructorStandings) &&
+      standings.ConstructorStandings.length > 0,
+  );
+
 export const getSeasonResults = async (year = "current") =>
   getOrSetCache(
     `ergast:season-results:${year}`,
